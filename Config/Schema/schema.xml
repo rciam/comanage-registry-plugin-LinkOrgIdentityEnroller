@@ -1,0 +1,91 @@
+<?xml version="1.0" ?>
+<!--
+  COmanage Registry Organizational Identity Source Plugin Database Schema
+
+  Portions licensed to the University Corporation for Advanced Internet
+  Development, Inc. ("UCAID") under one or more contributor license agreements.
+  See the NOTICE file distributed with this work for additional information
+  regarding copyright ownership.
+
+  UCAID licenses this file to you under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with the
+  License. You may obtain a copy of the License at:
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  
+  @link          http://www.internet2.edu/comanage COmanage Project
+  @package       registry
+  @since         COmanage Registry v2.0.0
+  @license       Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
+-->
+<!--
+  While this schema mostly works with database prefixes, foreign key constraints
+  must be specified in raw SQL, which needs the prefixed table name.
+-->
+<schema version="0.3">
+  <table name="link_org_identity_enrollers">
+    <field name="id" type="I">
+      <key />
+      <autoincrement />
+    </field>
+    <field name="co_id" type="I">
+      <constraint>REFERENCES cm_cos(id)</constraint>
+    </field>
+    <field name="status" type="C" size="1"/>
+    <field name="cmp_attribute_name" type="C" size="80" />
+    <field name="logout_endpoint" type="C" size="80"/>
+    <field name="aux_auth" type="C" size="80"/>
+    <!-- _subject and _body are deprecated (CO-1213) -->
+    <field name="verification_subject" type="C" size="256" />
+    <field name="verification_body" type="X" size="4000" />
+    <field name="return" type="C" size="50" />
+    <field name="exp_window" type="I"/>
+    <field name="introduction_text" type="X" size="4000" />
+    <field name="created" type="T" />
+    <field name="modified" type="T" />
+  </table>
+  
+  <table name="link_org_identity_states">
+    <field name="id" type="I">
+      <key />
+      <autoincrement />
+    </field>
+    <field name="link_org_identity_enroller_id" type="I">
+      <constraint>REFERENCES cm_link_org_identity_enrollers(id)</constraint>
+    </field>
+    <field name="token" type="C" size="80" />
+    <field name="exp_window" type="I"/>
+    <field name="email_redirect_mode" type="C" size="1" />
+    <field name="data" type="C" size="2048"/>
+    <field name="created" type="T" />
+    <field name="modified" type="T" />
+    <field name="deleted" type="L" />
+    <index name="link_org_identity_enrollers_i1">
+      <col>token</col>
+    </index>
+  </table>
+  
+  
+  <table name="link_org_identity_eofs">
+    <field name="id" type="I">
+      <key />
+      <autoincrement />
+    </field>
+    <field name="co_enrollment_flow_id" type="I">
+      <constraint>REFERENCES cm_co_enrollment_flows(id)</constraint>
+    </field>
+    <field name="link_org_identity_enroller_id" type="I">
+      <constraint>REFERENCES cm_link_org_identity_enrollers(id)</constraint>
+    </field>
+    <field name="mode" type="C" size="1"/>
+    <field name="created" type="T" />
+    <field name="modified" type="T" />
+  </table>
+  
+</schema>

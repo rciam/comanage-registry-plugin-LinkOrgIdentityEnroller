@@ -1,0 +1,64 @@
+/* Identity Linking Plugin */
+
+.link_org_identity_enrollers.link #main {
+  margin-left: 0 !important;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+}
+
+.link_org_identity_enrollers.link #customFooter {
+  display: flex;
+  justify-content: center;
+}
+
+.link_org_identity_enrollers.link .ssp-footer,
+.link_org_identity_enrollers.link #content-inner {
+  width: auto;
+  margin: auto 1rem auto 1rem;
+}
+
+.link_org_identity_enrollers.link .poweredByComanage {
+  display: none;
+}
+
+.link_org_identity_enrollers.link #debug {
+  display: none;
+}
+
+.link_org_identity_enrollers.link .co-info-topbox {
+  width: auto;
+  text-align: justify;
+}
+
+.link_org_identity_enrollers.link .co-grid .mdl-cell {
+  margin: auto;
+}
+
+.link_org_identity_enrollers.link #topLinks {
+  float: right;
+  margin: 1.2rem 0 0;
+}
+
+@media (max-width: 479px) {
+  .link_org_identity_enrollers.link .co-grid .mdl-cell {
+    margin: unset;
+  }
+
+  .link_org_identity_enrollers.link .actions {
+    margin-left: 8px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .link_org_identity_enrollers.link .ssp-footer,
+  .link_org_identity_enrollers.link #content-inner {
+    max-width: 350px;
+  }
+
+  .link_org_identity_enrollers.link #main {
+    overflow-x: hidden;
+  }
+}
+
+/* Identity Linking Plugin */
