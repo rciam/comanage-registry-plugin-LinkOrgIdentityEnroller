@@ -22,15 +22,14 @@ Improved user enrollment and identity linking process:
  
 ## Configuration
 ### Auxiliary Authtentication
-- In order for the plugin to handle the double authentication of the user during the explicit or the implicit linking we create a dummy authentication path named `registry-iss`. We anticipate to fetch the users attributes without logging him/her out of the COmanage session. In order for the auxiliary authentication to work we need to make publicly available the php file that implements the logic described above, under the registry-iss path. This is done by creating a symbolic link.
+In order for the plugin to handle the double authentication of the user during the explicit or the implicit linking we create a dummy authentication path named `registry-iss`. We anticipate to fetch the users attributes without logging him/her out of the COmanage session. In order for the auxiliary authentication to work we need to make publicly available the php file that implements the logic described above, under the registry-iss path. This is done by creating a symbolic link.
 ```bash
 # Command
 ln -s /path/to/comanage/local/Plugin/LinkOrgIdentityEnroller/webroot/auth/login /var/www//html/registry-iss
 # The auxiliary login is now publicly available
 root@comanage-server:/var/www/html/registry-iss -> /path/to/comanage/local/Plugin/LinkOrgIdentityEnroller/webroot/auth/login
 ```
-
-- Additionally we need to configure an extra authentication path in the shibboleth apache2 module. The configuration will look like below:
+Additionally we need to configure an extra authentication path in the shibboleth apache2 module. The configuration will look like below:
 ```xml
 ...
    <RequestMapper type="Native">
@@ -76,13 +75,13 @@ root@comanage-server:/var/www/html/registry-iss -> /path/to/comanage/local/Plugi
         </ApplicationOverride>
 ...
 ```
-- Configure a cron job that will delete any orphan tokens created by the Plugin after the configured time interval expires
-Create the cron file
+Configure a cron job that will delete any orphan tokens created by the Plugin after the configured time interval expires
+- Create the cron file
 ```bash
 cd /etc/cron.d
 vi comanage-registry
 ```
-Configure the action
+- Configure the action
 ```bash  
 #Delete expired COmanage tokens from linking plugin
 0 * * * * cd /opt/share/comanage-registry-rciam-3.1.x/app && Console/cake LinkOrgIdentityEnroller.state
@@ -91,8 +90,10 @@ Configure the action
 ### Plugin Configuration
 The LinkOrgIdentityEnroller plugin can be configured only by a coadmin or a cmadmin. The first one is the administrator of the CO that the plugin is enable and the second one is the administrator of the whole Registry framework.
 1. Navigate to Configuration > [Link Enroller](https://spaces.at.internet2.edu/pages/viewpage.action?pageId=87756108)
-- Redirect Mode
-![Linking Plugin Configuration](https://octodex.github.com/images/yaktocat.png)
+2. Configure either in Redirect Mode or in Email Confirmation Mode
+
+#### Redirect Mode
+![Redirect Mode](Documents/Images/configuration_page_email_disabled.png)
 <ol>
   <li>The friendly name of the CO we are currently configuring the plugin.
   <li>Pick Active to enable the plugin or suspended to skip it during enrollment
@@ -105,9 +106,10 @@ The LinkOrgIdentityEnroller plugin can be configured only by a coadmin or a cmad
   <li>This is the query parameter that encompasses the Service provider destination URL. This parameter is attached to the URL by the proxy and at the end of implicit Linking the user will get redirected to this service.
 </ol>
 
-- Email Confirmation Mode
-If we enable the email confirmation mode then the user will forced to logout and s/he will receive an email with an Invitation Url. By clicking this link will have to sign in with the new Identity Provider, if it is an explicit linking flow, or the Identity Provider of an existing account, if it is an implicit linking flow. The user should have access to his/her email if we enable this mode.
+#### Email Confirmation Mode
 
+If we enable the email confirmation mode then the user will forced to logout and s/he will receive an email with an Invitation Url. By clicking this link will have to sign in with the new Identity Provider, if it is an explicit linking flow, or the Identity Provider of an existing account, if it is an implicit linking flow. The user should have access to his/her email if we enable this mode.
+![Email Enabled](Documents/Images/email_confirmation_mode.png)
 
 ## Compatibility matrix
 
