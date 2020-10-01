@@ -46,7 +46,7 @@ Additionally we need to configure an extra authentication path in the shibboleth
                              REMOTE_USER="eduPersonUniqueId">
             <Sessions lifetime="5"
                       timeout="5"
-                      relayState="ss:db"
+                      relayState="ss:mem"
                       checkAddress="false"
                       handlerSSL="true"
                       cookieProps="; path=/registry-iss; secure; HttpOnly"
@@ -104,6 +104,7 @@ The LinkOrgIdentityEnroller plugin can be configured only by a coadmin or a cmad
   <li>Define the text that will be presented to the user during Sign Up in the linking page.
   <li>Enable or disable the Email Confirmation mode.
   <li>This is the query parameter that encompasses the Service provider destination URL. This parameter is attached to the URL by the proxy and at the end of implicit Linking the user will get redirected to this service.
+  <li>Add a CSV list of the Identity Providers that will be excluded during Implicit linking. Accepted formats are URLs and URNs.
 </ol>
 
 #### Email Confirmation Mode

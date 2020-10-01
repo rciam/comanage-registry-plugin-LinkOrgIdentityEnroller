@@ -27,7 +27,10 @@ class LinkOrgIdentityEnrollersController extends StandardController
         // Iterate through fields and values for each reg
         $tmp_reg = array();
         $tmp_reg['Full Name'] = $this->LinkOrgIdentityEnroller->maskString($reg[0]['given'], 3, 1) . " " . $this->LinkOrgIdentityEnroller->maskString($reg[0]['family'], 2, 2);
-        $tmp_reg['Email'] = $this->LinkOrgIdentityEnroller->maskString($reg[0]['pemail'], 2, 1);
+        $email_list = explode(',', $reg[0]['pemail']);
+        foreach($email_list as $email) {
+          $tmp_reg['Email'][] = $this->LinkOrgIdentityEnroller->maskString($email, 2, 1);
+        }
         // XXX For now we will hide the CO name. Keep it for future use or reference
 //        $tmp_reg['CO'] = $this->LinkOrgIdentityEnroller->maskString($reg[0]['co'], 2, 3);
         // Keep only one IdP entity ID if i have multiple value entries. Remove the IdP's with no entity ID available
@@ -58,7 +61,7 @@ class LinkOrgIdentityEnrollersController extends StandardController
   /**
    * Update a LinkOrgIdentityEnroller.
    *
-   * @since  COmanage Registry v2.0.0
+   * @since  COmanage Registry v3.1.1
    */
   
   public function configure() {
@@ -138,7 +141,13 @@ class LinkOrgIdentityEnrollersController extends StandardController
     $this->set('vv_cmp_attributes_list', $cmp_list);
     parent::beforeRender();
   }
-  
+
+  /**
+   * @param array $reqdata
+   * @param null $curdata
+   * @param null $origdata
+   * @return bool
+   */
   function checkWriteFollowups($reqdata, $curdata = NULL, $origdata = NULL) {
     $this->Flash->set(_txt('rs.updated-a3', array(_txt('ct.link_org_identity_enrollers.2'))), array('key' => 'success'));
     return true;
@@ -149,7 +158,7 @@ class LinkOrgIdentityEnrollersController extends StandardController
    * - precondition: Session.Auth holds data used for auth decisions
    * - postcondition: $permissions set with calculated permissions
    *
-   * @since  COmanage Registry v2.0.0
+   * @since  COmanage Registry v3.1.1
    * @return Array Permissions
    */
   
@@ -174,7 +183,7 @@ class LinkOrgIdentityEnrollersController extends StandardController
    * For Models that accept a CO ID, find the provided CO ID.
    * - precondition: A coid must be provided in $this->request (params or data)
    *
-   * @since  COmanage Registry v2.0.0
+   * @since  COmanage Registry v3.1.1
    * @return Integer The CO ID if found, or -1 if not
    */
   

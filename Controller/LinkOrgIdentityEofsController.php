@@ -94,7 +94,7 @@ class LinkOrgIdentityEofsController extends StandardController
    * For Models that accept a CO ID, find the provided CO ID.
    * - precondition: A coid must be provided in $this->request (params or data)
    *
-   * @since  COmanage Registry v2.0.0
+   * @since  COmanage Registry v3.1.1
    * @return Integer The CO ID if found, or -1 if not
    */
   
@@ -113,7 +113,7 @@ class LinkOrgIdentityEofsController extends StandardController
    * - precondition: Session.Auth holds data used for auth decisions
    * - postcondition: $permissions set with calculated permissions
    *
-   * @since  COmanage Registry v2.0.0
+   * @since  COmanage Registry v3.1.1
    * @return Array Permissions
    */
   

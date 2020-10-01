@@ -34,7 +34,7 @@ class LinkOrgIdentityEnrollerCoPetitionsController extends CoPetitionsController
    * @param Array $oiscfg Array of configuration data for this plugin
    * @param Array $onFinish URL, in Cake format
    * @param Integer $actorCoPersonId CO Person ID of actor
-   * @since  COmanage Registry v2.0.0
+   * @since  COmanage Registry v3.1.1
    */
   protected function execute_plugin_start($id, $onFinish)
   {
@@ -179,7 +179,11 @@ class LinkOrgIdentityEnrollerCoPetitionsController extends CoPetitionsController
     }
     // If we want to add and idp in the registered user, means that the auth array in the Session will have CO entries and won't be empty
     // Now that i have the type and value i should check the registry
-    list($registrations, $orgIdentities_list) = $this->LinkOrgIdentityEnroller->getCoPersonMatches($attribute_type, $attribute_value, $eof_ea['CoEnrollmentFlow']['co_id']);
+    list($registrations, $orgIdentities_list) = $this->LinkOrgIdentityEnroller->getCoPersonMatches(
+      $attribute_type,
+      $attribute_value,
+      $eof_ea['CoEnrollmentFlow']['co_id'],
+      $loiecfg['LinkOrgIdentityEnroller']['idp_blacklist']);
     
     // if there are no registered users continue with the enrollment
     if(empty($registrations)){
@@ -215,7 +219,7 @@ class LinkOrgIdentityEnrollerCoPetitionsController extends CoPetitionsController
   /**
    * Process petitioner attributes
    *
-   * @since  COmanage Registry v0.9.4
+   * @since  COmanage Registry v3.1.1
    */
   protected function execute_plugin_petitionerAttributes($id, $onFinish) {
     // The step is done
@@ -226,7 +230,7 @@ class LinkOrgIdentityEnrollerCoPetitionsController extends CoPetitionsController
    * Callback before other controller methods are invoked or views are rendered.
    * - postcondition: If invalid enrollment flow provided, session flash message set
    *
-   * @since  COmanage Registry v3.1.0
+   * @since  COmanage Registry v3.1.1
    */
   
   function beforeFilter() {
@@ -292,7 +296,7 @@ class LinkOrgIdentityEnrollerCoPetitionsController extends CoPetitionsController
    * - precondition: Session.Auth holds data used for authz decisions
    * - postcondition: $permissions set with calculated permissions
    *
-   * @since  COmanage Registry v3.1.0
+   * @since  COmanage Registry v3.1.1
    * @return Array Permissions
    */
   

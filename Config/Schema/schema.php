@@ -20,6 +20,7 @@ class AppSchema extends CakeSchema
     'verification_subject' => array('type' => 'string', 'null' => false, 'length' => 256),
     'verification_body' => array('type' => 'string', 'null' => false, 'length' => 4000),
     'introduction_text' => array('type' => 'string', 'null' => false, 'length' => 4000),
+    'idp_blacklist' => array('type' => 'string', 'null' => false, 'length' => 4000),
     'logout_endpoint' => array('type' => 'string', 'null' => false, 'length' => 80),
     'aux_auth' => array('type' => 'string', 'null' => false, 'length' => 80),
     'return' => array('type' => 'string', 'null' => false, 'length' => 50),

@@ -85,7 +85,7 @@ $this->Html->css('LinkOrgIdentityEnroller.linker', array('inline' => false));
             <div class="field-info">
               <?php
               if($field != 'pid' &&  $field != 'IdP') {
-                print $value;
+                print is_array($value) ? implode(', ', $value) : $value;
               }
               if($field == 'IdP'){
                 $default_item = reset($value);

@@ -545,7 +545,22 @@ if (!$e) {
       ?>
     </div>
   </li>
-  
+  <li id="<?php print Inflector::slug(strtolower(_txt('pl.link_org_identity_enroller.idpblacklist')));?>" class="field-stack">
+    <div class="field-name">
+      <div class="field-title">
+        <?php print _txt('pl.link_org_identity_enroller.idpblacklist'); ?>
+      </div>
+      <div class="field-desc"><?php print _txt('pl.link_org_identity_enroller.idpblacklist.desc'); ?></div>
+    </div>
+    <div class="field-info">
+      <?php
+      $idp_blacklist = empty($link_org_identity_enrollers['LinkOrgIdentityEnroller']['idp_blacklist']) ? ""
+        : filter_var($link_org_identity_enrollers['LinkOrgIdentityEnroller']['idp_blacklist'],FILTER_SANITIZE_SPECIAL_CHARS);
+      print $this->Form->textarea('LinkOrgIdentityEnroller.idp_blacklist', array('size' => 4000, 'value' => $idp_blacklist));
+      ?>
+    </div>
+  </li>
+
   
   <?php if($e): ?>
     <li class="fields-submit">

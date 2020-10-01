@@ -74,6 +74,11 @@ class LinkOrgIdentityEnroller extends AppModel
       'required' => false,
       'allowEmpty' => true
     ),
+    'idp_blacklist' => array(
+      'rule' => 'notBlank',
+      'required' => false,
+      'allowEmpty' => true
+    ),
     'return' => array(
       'rule' => 'notBlank',
       'required' => false,
@@ -95,14 +100,46 @@ class LinkOrgIdentityEnroller extends AppModel
               'action'     => 'configure'))
     );
   }
-  
+
+  /**
+   * @param array $options
+   * @return bool
+   * @todo FILTER_VALIDATE_URL returns true if i have duplicate characters like httttttps.
+   */
+  public function beforeSave($options = array()) {
+    // XXX Check the validation of the IdP csv Blacklist
+    if(!empty($this->data["LinkOrgIdentityEnroller"]["idp_blacklist"])) {
+      $idp_list = explode(',', $this->data["LinkOrgIdentityEnroller"]["idp_blacklist"]);
+
+      foreach($idp_list as $idp) {
+        if(!filter_var($idp, FILTER_VALIDATE_URL)
+           && !$this->urnValidationFilter($idp)) {
+          return false;
+        }
+      }
+    }
+    parent::beforeSave($options);
+    return true;
+  }
+
+  /**
+   * Validate the urn. It should match the AARC G002 notation
+   * @param string $urn
+   * @return false|int
+   */
+  public function urnValidationFilter($urn) {
+    $re = '/^urn:[a-z0-9][a-z0-9-]{0,31}:[a-z0-9()+,\-.:=@;$_!*\'%\/?#]+$/m';
+    return preg_match($re, $urn);
+  }
+
   /**
    * @param String $attribute_type cmpEnrollmentAttribute
    * @param String $attribute_value Value of Enrollment Attribute
    * @param Integer $co_id
+   * @param String $csv_idp_blacklist Comma Separated List of Identity Providers that will excluded from implicit linking
    * @return array|null
    */
-  public function getCoPersonMatches($attribute_type, $attribute_value, $co_id) {
+  public function getCoPersonMatches($attribute_type, $attribute_value, $co_id, $csv_idp_blacklist) {
     $this->log(__METHOD__ . "::@", LOG_DEBUG);
     $this->log(__METHOD__ . "::attribute type = " . $attribute_type, LOG_DEBUG);
     $this->log(__METHOD__ . "::attribute value = " . $attribute_value, LOG_DEBUG);
@@ -110,63 +147,67 @@ class LinkOrgIdentityEnroller extends AppModel
     
     switch ($attribute_type) {
       case "mail":
-        $official = EmailAddressEnum::Official;
-        $active = SuspendableStatusEnum::Active;
+        $email_type = EmailAddressEnum::Official;
+        $co_status = SuspendableStatusEnum::Active;
+        $co_person_status = StatusEnum::Active;
         // Only need the COPerson's email to be verified and not the ones enlisted in the OrgIdentities
         // We want the co people that we will retrieve to have the email verified at least in one linked idp. If we fetch the account then we will
         // fetch all the idps regardless of the email confirmation status.
-        //$query_string = "select distinct names.given, names.family, mail.mail as pemail, people.id as pid, people.status as pstatus, oid.id as OId, oid.authn_authority as IdP, mailOid.mail as OIdEmail, cos.name as CO" .
-        $query_string = "select"
-          . " distinct names.given as given,"
-          . " names.family as family,"
-          . " mail.mail as pemail,"
-          . " mail.verified as pverified,"
-          . " mailOid.verified as oidverified,"
+        // XXX We are only interested for the verified emails. So we need no aggregation complexity for the boolean fields. The CSV list can only be verified true.
+        $query_string = "select distinct string_agg(DISTINCT names.given, ',') as given,"
+          . " string_agg(DISTINCT names.family, ',') as family,"
+          . " string_agg(DISTINCT mail.mail, ',') as pemail,"
+          . " cast(string_agg(DISTINCT cast(mail.verified AS text), ',') as bool) as pverified,"
+          . " cast(string_agg(DISTINCT cast(mailOid.verified AS text), ',') as bool) as oidverified,"
           . " people.id as pid,"
-          . " people.status as pstatus,"
-          . " cos.name as CO"
+          . " string_agg(DISTINCT people.status, ',') as pstatus,"
+          . " string_agg(DISTINCT cos.name, ',') as CO"
           . " from cm_email_addresses as mail"
-          . " inner join cm_names names on mail.co_person_id = names.co_person_id and not mail.deleted and mail.email_address_id is null and mail.type='{$official}'"
-          . " inner join cm_co_people as people on people.id = mail.co_person_id and people.co_id = {$co_id} and people.status='A' and not people.deleted and people.co_person_id is null"
-          . " inner join cm_cos as cos on people.co_id=cos.id and cos.status='{$active}'"
-          . " inner join cm_co_org_identity_links as links on people.id=links.co_person_id and not links.deleted and links.co_org_identity_link_id is null"
-          . " inner join cm_org_identities as oid on oid.id=links.org_identity_id and not oid.deleted and oid.org_identity_id is null"
-          . " inner join cm_email_addresses as mailOid on mailOid.org_identity_id = oid.id and not mailOid.deleted and mailOid.email_address_id is null and mailOid.type='{$official}'"
-          . " where (mail.mail='{$attribute_value}' or mailOid.mail='{$attribute_value}')"
-          . " and (mail.verified=true or mailOid.verified=true)"
-          . " and oid.authn_authority is not null";
+          . " inner join cm_names names"
+          . " on mail.co_person_id = names.co_person_id and not mail.deleted and mail.email_address_id is null and"
+          . " mail.type = '{$email_type}' and mail.verified = true"
+          . " inner join cm_co_people as people"
+          . " on people.id = mail.co_person_id and people.co_id = {$co_id} and people.status = '{$co_person_status}' and"
+          . " not people.deleted and people.co_person_id is null"
+          . " inner join cm_cos as cos on people.co_id = cos.id and cos.status = '{$co_status}'"
+          . " inner join cm_co_org_identity_links as links"
+          . " on people.id = links.co_person_id and not links.deleted and links.co_org_identity_link_id is null"
+          . " inner join cm_org_identities as oid"
+          . " on oid.id = links.org_identity_id and not oid.deleted and oid.org_identity_id is null"
+          . " inner join cm_email_addresses as mailOid"
+          . " on mailOid.org_identity_id = oid.id and not mailOid.deleted and mailOid.email_address_id is null and"
+          . " mailOid.type = '{$email_type}'"
+          . " where (mail.mail = '{$attribute_value}' or mailOid.mail = '{$attribute_value}')"
+          . " and (mail.verified = true or mailOid.verified = true)"
+          . " and oid.authn_authority is not null"
+          . " GROUP BY people.id;";
         $this->log(__METHOD__ . "::query => " . $query_string, LOG_DEBUG);
         $registrations = $this->query($query_string);
         $this->log(__METHOD__ . "::email matches => " . print_r($registrations, true), LOG_DEBUG);
+
+        // todo: move this to a separate function
         // For each registration i want to find all the linked idps and present them to the user
         $this->OrgIdentity = ClassRegistry::init('OrgIdentity');
         // An array with all the idps associated with this user
         $orgIdentities_list = array();
         foreach($registrations as &$registration){
           $pid = $registration[0]['pid'];
-          // Get list of IdPs for each user
-          $idpsList = $this->OrgIdentity->find('list', array(
-              'fields' => array(
-                'OrgIdentity.id',
-                'OrgIdentity.authn_authority'
-              ),
-              'contain' => false,
-              'conditions' => array(
-                'CoOrgIdentityLink.co_person_id = ' . $pid,
-                'OrgIdentity.authn_authority is not null',
-              ),
-              'joins' => array(
-                array(
-                  'table' => 'co_org_identity_links',
-                  'alias' => 'CoOrgIdentityLink',
-                  'type' => 'INNER',
-                  'conditions' => array(
-                    'CoOrgIdentityLink.org_identity_id = OrgIdentity.id',
-                  )
-                ),
-              ),
-            )
-          );
+          // XXX Get list of IdPs for each user. Exclude the ones blacklisted in the configuration
+          $args = array();
+          $args['joins'][0]['table'] = 'co_org_identity_links';
+          $args['joins'][0]['alias'] = 'CoOrgIdentityLink';
+          $args['joins'][0]['type'] = 'INNER';
+          $args['joins'][0]['conditions'] = array('CoOrgIdentityLink.org_identity_id=OrgIdentity.id');
+          $args['conditions']['CoOrgIdentityLink.co_person_id'] = $pid;
+          $args['conditions'][] = 'OrgIdentity.authn_authority is not null';
+          if(!empty($csv_idp_blacklist)) {
+            $idp_list = explode(',', $csv_idp_blacklist);
+            $args['conditions']['NOT']['OrgIdentity.authn_authority'] = $idp_list;
+          }
+          $args['contain'] = false;
+          $args['fields'] = array('OrgIdentity.id','OrgIdentity.authn_authority');
+          $idpsList = $this->OrgIdentity->find('list', $args);
+
           // Update the idps list in the registration table
           if(!empty($idpsList)) {
             $registration[0]['idp'] = $idpsList;
@@ -399,12 +440,21 @@ class LinkOrgIdentityEnroller extends AppModel
    */
   public function createOrgIdentity($registered_user, $cmp_attibutes_list, $email_verified) {
     $this->OrgIdentity = ClassRegistry::init('OrgIdentity');
+
     // Create the data we need to save so as to create the OrgIdentity and all the relations
+    $authn_authority_list = explode(';', $cmp_attibutes_list['AuthenticatingAuthority']);
+    // Change the Name Model to accept empty values for given column if we get an empty value
+    if(empty($cmp_attibutes_list['givenName'])) {
+      $this->Name = ClassRegistry::init('Name');
+      $this->Name->validate["given"]["content"]["required"] = false;
+      $this->Name->validate["given"]["content"]["allowEmpty"] = true;
+      unset($this->Name->validate["given"]["filter"]);
+    }
     $association_data = array(
       'OrgIdentity' => array(
         'co_id'             => (int)$registered_user['co_id'],
-        'actor_identifier'  => $cmp_attibutes_list['eduPersonUniqueId'], // new Idp data
-        'authn_authority'   => $cmp_attibutes_list['AuthenticatingAuthority'],
+        'actor_identifier'  => $cmp_attibutes_list['eduPersonUniqueId'], // Mew IdP data
+        'authn_authority'   => end($authn_authority_list),     // Get the last AuthnAthority
         'affiliation'       => AffiliationEnum::Member,
       ),
       'CoOrgIdentityLink'   => array(

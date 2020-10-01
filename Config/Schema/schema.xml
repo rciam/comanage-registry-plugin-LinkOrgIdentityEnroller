@@ -47,6 +47,7 @@
     <field name="return" type="C" size="50" />
     <field name="exp_window" type="I"/>
     <field name="introduction_text" type="X" size="4000" />
+    <field name="idp_blacklist" type="X" size="4000" />
     <field name="created" type="T" />
     <field name="modified" type="T" />
   </table>

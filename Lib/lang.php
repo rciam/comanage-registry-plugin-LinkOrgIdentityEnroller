@@ -37,12 +37,14 @@ $cm_link_org_identity_enroller_texts['en_US'] = array(
   'pl.link_org_identity_enroller.vbody'                    => 'Email Body',
   'pl.link_org_identity_enroller.vbody.desc'               => 'Body for email message sent as part of linking redirect flow. Max 4000 characters.',
   'pl.link_org_identity_enroller.ce'                       => 'Email Confirmation Mode',
-  'pl.link_org_identity_enroller.ce.desc'                  => 'Enable/Disable Email Confirmation Mode',
+  'pl.link_org_identity_enroller.ce.desc'                  => 'See <a href="https://github.com/rciam/comanage-registry/blob/rciam-3.1.x/README.md">README</a> for mode definitions',
   'pl.link_org_identity_enroller.intro'                    => 'Introduction',
   'pl.link_org_identity_enroller.intro.desc'               => 'Optional text to display at the top of the CO Person selection page',
   'pl.link_org_identity_enroller.return'                   => 'Return parameter',
   'pl.link_org_identity_enroller.return.desc'              => 'This is the return query parameter with the Service URL. At the end of linking we will redirect at the url stored in this parameter.',
-  
+  'pl.link_org_identity_enroller.idpblacklist'             => 'Identity Provider Blacklist',
+  'pl.link_org_identity_enroller.idpblacklist.desc'        => 'Provide the CSV list of Identity Providers that will be excluded from implicit linking',
+
   
   // Operation
   'op.link_org_identity_enroller.link'                    => 'Link',
