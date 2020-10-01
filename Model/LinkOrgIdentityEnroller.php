@@ -157,8 +157,6 @@ class LinkOrgIdentityEnroller extends AppModel
         $query_string = "select distinct string_agg(DISTINCT names.given, ',') as given,"
           . " string_agg(DISTINCT names.family, ',') as family,"
           . " string_agg(DISTINCT mail.mail, ',') as pemail,"
-          . " cast(string_agg(DISTINCT cast(mail.verified AS text), ',') as bool) as pverified,"
-          . " cast(string_agg(DISTINCT cast(mailOid.verified AS text), ',') as bool) as oidverified,"
           . " people.id as pid,"
           . " string_agg(DISTINCT people.status, ',') as pstatus,"
           . " string_agg(DISTINCT cos.name, ',') as CO"
@@ -177,8 +175,8 @@ class LinkOrgIdentityEnroller extends AppModel
           . " inner join cm_email_addresses as mailOid"
           . " on mailOid.org_identity_id = oid.id and not mailOid.deleted and mailOid.email_address_id is null and"
           . " mailOid.type = '{$email_type}'"
-          . " where (mail.mail = '{$attribute_value}' or mailOid.mail = '{$attribute_value}')"
-          . " and (mail.verified = true or mailOid.verified = true)"
+          . " where (mail.mail = '{$attribute_value}' and mail.verified = true)"
+          . " or ( mailOid.mail = '{$attribute_value}' and mailOid.verified = true)"
           . " and oid.authn_authority is not null"
           . " GROUP BY people.id;";
         $this->log(__METHOD__ . "::query => " . $query_string, LOG_DEBUG);
