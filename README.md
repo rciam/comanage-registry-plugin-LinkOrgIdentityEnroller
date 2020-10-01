@@ -34,7 +34,7 @@ Additionally we need to configure an extra authentication path in the shibboleth
 ...
    <RequestMapper type="Native">
         <RequestMap applicationId="default">
-            <Host name="comanage-dev.aai-dev.grnet.gr">
+            <Host name="example.com">
                 <!-- I should not require a session for the Comanage login page. If i do i will be redirected to the proxy and not the auth/login url -->
                 <Path name="registry" authType="shibboleth"/>
                 <Path name="registry-iss" applicationId="iss" authType="shibboleth" requireSession="true"/>
@@ -42,7 +42,7 @@ Additionally we need to configure an extra authentication path in the shibboleth
         </RequestMap>
     </RequestMapper>
 ...
-        <ApplicationOverride id="iss" entityID="https://comanage-dev.aai-dev.grnet.gr/registry-iss/shibboleth"
+        <ApplicationOverride id="iss" entityID="https://example.com/registry-iss/shibboleth"
                              REMOTE_USER="eduPersonUniqueId">
             <Sessions lifetime="5"
                       timeout="5"
@@ -56,7 +56,7 @@ Additionally we need to configure an extra authentication path in the shibboleth
                       handlerURL="/registry-iss/Shibboleth.sso">
                 <!-- We need to force reAuthentication here -->
                 <!-- Check this article: https://wiki.shibboleth.net/confluence/display/SP3/ForceAuthn -->
-                <SSO entityID="https://aai-dev.egi.eu/proxy/saml2/idp/metadata.php" forceAuthn="true">SAML2</SSO>
+                <SSO entityID="https://example.com/proxy/saml2/idp/metadata.php" forceAuthn="true">SAML2</SSO>
  
                 <Logout>Local</Logout>
  
@@ -118,7 +118,7 @@ This table matches the Plugin version with the supported COmanage version.
 
 | Plugin |  COmanage |    PHP    |
 |:------:|:---------:|:---------:|
-| v0.1.0 | v3.1.x    | &gt;=v5.6 |
+| v0.2.0 | v3.1.x    | &gt;=v5.6 |
 
 ## License
 
