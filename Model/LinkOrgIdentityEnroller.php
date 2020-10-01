@@ -448,6 +448,7 @@ class LinkOrgIdentityEnroller extends AppModel
       $this->Name->validate["given"]["content"]["allowEmpty"] = true;
       unset($this->Name->validate["given"]["filter"]);
     }
+
     $association_data = array(
       'OrgIdentity' => array(
         'co_id'             => (int)$registered_user['co_id'],
@@ -470,14 +471,6 @@ class LinkOrgIdentityEnroller extends AppModel
           'actor_identifier'  => $cmp_attibutes_list['eduPersonUniqueId'],
         )
       ),
-      'EmailAddress' => array(
-        array(
-          'type'              => EmailAddressEnum::Official,
-          'mail'              => $cmp_attibutes_list['mail'],
-          'verified'          => (bool)$email_verified,
-          'actor_identifier'  => $cmp_attibutes_list['eduPersonUniqueId'],
-        )
-      ),
       'Name' => array(
         array(
           'given'             => $cmp_attibutes_list['givenName'],
@@ -488,6 +481,22 @@ class LinkOrgIdentityEnroller extends AppModel
         )
       ),
     );
+
+    // Change the EmailAddress Model to accept empty values for given column if we get an empty value
+    if(empty($cmp_attibutes_list['mail'])) {
+      $this->EmailAddress = ClassRegistry::init('EmailAddress');
+      $this->EmailAddress->validate["mail"]["content"]["required"] = false;
+      $this->EmailAddress->validate["mail"]["content"]["allowEmpty"] = true;
+    } else {
+      $association_data['EmailAddress'] = array(
+        array(
+          'type'              => EmailAddressEnum::Official,
+          'mail'              => $cmp_attibutes_list['mail'],
+          'verified'          => (bool)$email_verified,
+          'actor_identifier'  => $cmp_attibutes_list['eduPersonUniqueId'],
+        )
+      );
+    }
   
     // The Subject DN is fetched as the attribute distinguishedName
     if(!empty($cmp_attibutes_list['distinguishedName'])){

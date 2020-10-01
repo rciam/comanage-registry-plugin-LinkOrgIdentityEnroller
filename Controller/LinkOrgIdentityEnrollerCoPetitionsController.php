@@ -82,7 +82,8 @@ class LinkOrgIdentityEnrollerCoPetitionsController extends CoPetitionsController
           $this->redirect($this->redirect_location);
         }
       }
-      
+
+      $this->log(__METHOD__ . "::dataTable['cmp_attributes_list'] => " .print_r($dataTable['cmp_attributes_list'],true), LOG_DEBUG);
       $verified = (preg_match("/mail/i", $loiecfg['LinkOrgIdentityEnroller']['cmp_attribute_name'])!= false ) ? true : false;
       // Try to save the schema to the database with only one transaction
       if ($this->LinkOrgIdentityEnroller->createOrgIdentity($dataTable['registered_user'], $dataTable['cmp_attributes_list'], $verified)) {
