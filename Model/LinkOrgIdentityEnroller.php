@@ -441,13 +441,6 @@ class LinkOrgIdentityEnroller extends AppModel
 
     // Create the data we need to save so as to create the OrgIdentity and all the relations
     $authn_authority_list = explode(';', $cmp_attibutes_list['AuthenticatingAuthority']);
-    // Change the Name Model to accept empty values for given column if we get an empty value
-    if(empty($cmp_attibutes_list['givenName'])) {
-      $this->Name = ClassRegistry::init('Name');
-      $this->Name->validate["given"]["content"]["required"] = false;
-      $this->Name->validate["given"]["content"]["allowEmpty"] = true;
-      unset($this->Name->validate["given"]["filter"]);
-    }
 
     $association_data = array(
       'OrgIdentity' => array(
@@ -471,7 +464,17 @@ class LinkOrgIdentityEnroller extends AppModel
           'actor_identifier'  => $cmp_attibutes_list['eduPersonUniqueId'],
         )
       ),
-      'Name' => array(
+    );
+
+    // Change the Name Model to accept empty values for given column if we get an empty value
+    if(empty($cmp_attibutes_list['givenName'])) {
+      $this->Name = ClassRegistry::init('Name');
+      $this->Name->validate["given"]["content"]["required"] = false;
+      $this->Name->validate["given"]["content"]["allowEmpty"] = true;
+      unset($this->Name->validate["given"]["filter"]);
+    }
+    if(!empty($cmp_attibutes_list['givenName']) || !empty($cmp_attibutes_list['sn'])) {
+      $association_data['Name'] = array(
         array(
           'given'             => $cmp_attibutes_list['givenName'],
           'family'            => $cmp_attibutes_list['sn'],
@@ -479,8 +482,8 @@ class LinkOrgIdentityEnroller extends AppModel
           'primary_name'      => true,
           'actor_identifier'  => $cmp_attibutes_list['eduPersonUniqueId'],
         )
-      ),
-    );
+      );
+    }
 
     // Change the EmailAddress Model to accept empty values for given column if we get an empty value
     if(empty($cmp_attibutes_list['mail'])) {
