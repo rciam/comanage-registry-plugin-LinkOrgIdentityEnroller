@@ -26,6 +26,12 @@ class LinkOrgIdentityState extends AppModel
       'required' => true,
       'message' => 'Provide data',
     ),
+    'type' => array(
+      'rule' => array('inList', array(LinkOrgIdentityTypeEnum::Implicit,
+                                      LinkOrgIdentityTypeEnum::Explicit)),
+      'required' => true,
+      'message' => 'Provide Linking type(Implicit|Explicit)',
+    ),
   );
 
   /**

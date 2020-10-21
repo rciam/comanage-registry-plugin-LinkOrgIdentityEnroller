@@ -16,6 +16,7 @@ $cm_link_org_identity_enroller_texts['en_US'] = array(
   'er.link_org_identity_enroller.no_aux_path'       => 'Found no Auxiliary Authentication path. Aborting.',
   'er.link_org_identity_enroller.no_remote_user'    => 'Remote User was empty.',
   'er.link_org_identity_enroller.expiration_passed' => 'The invitation time window to link has expired.',
+  'er.link_org_identity_enroller.save_failed'       => 'Database Save Failed.',
   // Plugin text
   'pl.link_org_identity_enroller.co_name'                  => 'CO Name',
   'pl.link_org_identity_enroller.co_name.desc'             => 'This is the CO Name the enroller plugin belongs to',

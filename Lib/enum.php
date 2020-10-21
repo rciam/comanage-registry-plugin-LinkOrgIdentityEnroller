@@ -22,6 +22,16 @@ class LinkOrgIdentityEofModeEnum
   );
 }
 
+class LinkOrgIdentityTypeEnum
+{
+  const Implicit           = 'IM';
+  const Explicit           = 'EX';
+  const type = array(
+    'IM' => 'Implicit',
+    'EX' => 'Explicit',
+  );
+}
+
 class LinkOrgIdentityStatusEnum
 {
   const Active              = 'A';

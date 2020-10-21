@@ -190,22 +190,7 @@ class LinkOrgIdentityEnroller extends AppModel
         $orgIdentities_list = array();
         foreach($registrations as &$registration){
           $pid = $registration[0]['pid'];
-          // XXX Get list of IdPs for each user. Exclude the ones blacklisted in the configuration
-          $args = array();
-          $args['joins'][0]['table'] = 'co_org_identity_links';
-          $args['joins'][0]['alias'] = 'CoOrgIdentityLink';
-          $args['joins'][0]['type'] = 'INNER';
-          $args['joins'][0]['conditions'] = array('CoOrgIdentityLink.org_identity_id=OrgIdentity.id');
-          $args['conditions']['CoOrgIdentityLink.co_person_id'] = $pid;
-          $args['conditions'][] = 'OrgIdentity.authn_authority is not null';
-          if(!empty($csv_idp_blacklist)) {
-            $idp_list = explode(',', $csv_idp_blacklist);
-            $args['conditions']['NOT']['OrgIdentity.authn_authority'] = $idp_list;
-          }
-          $args['contain'] = false;
-          $args['fields'] = array('OrgIdentity.id','OrgIdentity.authn_authority');
-          $idpsList = $this->OrgIdentity->find('list', $args);
-
+          $idpsList = $this->getOrgIdentitiesForCoPerson($pid, $csv_idp_blacklist);
           // Update the idps list in the registration table
           if(!empty($idpsList)) {
             $registration[0]['idp'] = $idpsList;
@@ -221,6 +206,30 @@ class LinkOrgIdentityEnroller extends AppModel
     }
     
     return null;
+  }
+
+  /**
+   * Get all the linked OrgIdentities for a CO Person. Exclude the ones blacklisted in the configuration
+   * @param integer $person_id
+   * @param string $csv_idp_blacklist CSV list of Authenticating Authorities to exclude
+   *
+   * @return array List of Identity Providers [id=>authn_authority]
+   */
+  public function getOrgIdentitiesForCoPerson($person_id, $csv_idp_blacklist) {
+    $args = array();
+    $args['joins'][0]['table'] = 'co_org_identity_links';
+    $args['joins'][0]['alias'] = 'CoOrgIdentityLink';
+    $args['joins'][0]['type'] = 'INNER';
+    $args['joins'][0]['conditions'] = array('CoOrgIdentityLink.org_identity_id=OrgIdentity.id');
+    $args['conditions']['CoOrgIdentityLink.co_person_id'] = $person_id;
+    $args['conditions'][] = 'OrgIdentity.authn_authority is not null';
+    if(!empty($csv_idp_blacklist)) {
+      $idp_list = explode(',', $csv_idp_blacklist);
+      $args['conditions']['NOT']['OrgIdentity.authn_authority'] = $idp_list;
+    }
+    $args['contain'] = false;
+    $args['fields'] = array('OrgIdentity.id','OrgIdentity.authn_authority');
+    return $this->OrgIdentity->find('list', $args);
   }
   
   /**
@@ -408,7 +417,7 @@ class LinkOrgIdentityEnroller extends AppModel
    * @param $co_id
    * @return array
    */
-  public function findCoPersonforIdentifier($identifier, $co_id=null){
+  public function findCoPersonforIdentifier($identifier, $co_id=null) {
     if(empty($identifier)) {
       return [];
     }

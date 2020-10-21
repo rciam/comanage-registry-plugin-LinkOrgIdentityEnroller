@@ -37,6 +37,7 @@ class AppSchema extends CakeSchema
     'link_org_identity_enroller_id' => array('type' => 'integer', 'null' => true, 'length' => 10),
     'token' => array('type' => 'string', 'null' => false, 'length' => 80),
     'data' => array('type' => 'string', 'null' => false, 'length' => 2048),
+    'type' => array('type' => 'string', 'null' => false, 'length' => 2),
     'created' => array('type' => 'datetime', 'null' => false),
     'modified' => array('type' => 'datetime', 'null' => true),
     'deleted' => array('type' => 'boolean', 'null' => false, 'default' => 'f'),

@@ -15,7 +15,7 @@ class LinkOrgIdentityEnrollerCoPetitionsController extends CoPetitionsController
     )
   );
   private $redirect_location = "/";
-  
+
   public $uses = array(
     "CoEnrollmentFlow",
     "OrgIdentity",
@@ -142,8 +142,35 @@ class LinkOrgIdentityEnrollerCoPetitionsController extends CoPetitionsController
       $this->log(__METHOD__ . "::Plugin is not supported for this enrollment ", LOG_DEBUG);
       $this->redirect($onFinish);
     }
-    
-    if ( $eof_ea['CoEnrollmentFlow']['authz_level'] == EnrollmentAuthzEnum::AuthUser ) {
+    // XXX Default to Explicit Linking
+    $linking_type = LinkOrgIdentityTypeEnum::Explicit;
+    $this->Session->write('Plugin.LinkOrgIdentityEnroller.type', LinkOrgIdentityTypeEnum::Explicit);
+
+    // XXX Explicit Linking
+    if($eof_ea['CoEnrollmentFlow']['authz_level'] !== EnrollmentAuthzEnum::AuthUser &&
+      $eof_ea['CoEnrollmentFlow']['authz_level'] !== EnrollmentAuthzEnum::None &&
+      $eof_ea['CoEnrollmentFlow']['match_policy'] === EnrollmentMatchPolicyEnum::Self){
+      $target = array();
+      $target['action'] = 'logout';
+      $target['controller'] = Inflector::tableize($this->name);
+      $target['plugin'] = Inflector::singularize(Inflector::tableize($this->plugin));
+      $target['co'] = (int)$eof_ea['CoEnrollmentFlow']['co_id'];
+      $target['coef'] = (int)$onFinish['coef'];
+      $target['cfg'] = (int)$loiecfg['LinkOrgIdentityEnroller']['id'];
+      if (!empty($this->request->query)) {
+        $target['?'] = $this->request->query;
+      }
+      $this->redirect($target);
+    }
+    // XXX Continue with the Enrollment Flow
+    if($eof_ea['CoEnrollmentFlow']['authz_level'] === EnrollmentAuthzEnum::None ) {
+      $this->redirect($onFinish);
+    }
+
+    // XXX Implicit Linking
+    if ( $eof_ea['CoEnrollmentFlow']['authz_level'] === EnrollmentAuthzEnum::AuthUser ) {
+      $linking_type = LinkOrgIdentityTypeEnum::Implicit;
+      $this->Session->write('Plugin.LinkOrgIdentityEnroller.type', LinkOrgIdentityTypeEnum::Implicit);
       // Let's check if the Identifier is already in the registry for the current CO
       $duplicate = $this->LinkOrgIdentityEnroller->findDuplicateOrgId($this->Session->read('Auth.User.username'), $eof_ea['CoEnrollmentFlow']['co_id']);
       if ($duplicate) {
@@ -173,7 +200,7 @@ class LinkOrgIdentityEnrollerCoPetitionsController extends CoPetitionsController
       getenv($attribute_type)
       : "";
     
-    // What will happen if the attribute value is empty?
+    // XXX Continue with the Enrollment Flow if the attribute is not available in the environment
     if (empty($attribute_value)) {
       $this->log(__METHOD__ . "::attribute value is empty. The enrollment flow will proceed in default mode.");
       $this->redirect($onFinish);
@@ -186,7 +213,7 @@ class LinkOrgIdentityEnrollerCoPetitionsController extends CoPetitionsController
       $eof_ea['CoEnrollmentFlow']['co_id'],
       $loiecfg['LinkOrgIdentityEnroller']['idp_blacklist']);
     
-    // if there are no registered users continue with the enrollment
+    // XXX If there are no registered users and this is an Implicit Linking continue with the enrollment
     if(empty($registrations)){
       $this->redirect($onFinish);
     }
@@ -194,18 +221,8 @@ class LinkOrgIdentityEnrollerCoPetitionsController extends CoPetitionsController
     $target = array();
     $this->Session->write('Auth.User.Registrations', $registrations);
     $this->Session->write('Auth.User.OrgIdentities', $orgIdentities_list);
-    if($eof_ea['CoEnrollmentFlow']['authz_level'] == EnrollmentAuthzEnum::AuthUser ) {
-       $target['action'] = 'link';
-       $target['controller'] = Inflector::tableize($this->plugin);
-    }else if($eof_ea['CoEnrollmentFlow']['authz_level'] != EnrollmentAuthzEnum::AuthUser &&
-             $eof_ea['CoEnrollmentFlow']['authz_level'] != EnrollmentAuthzEnum::None &&
-             $eof_ea['CoEnrollmentFlow']['match_policy'] == EnrollmentMatchPolicyEnum::Self){
-      $target['action'] = 'logout';
-      $target['controller'] = Inflector::tableize($this->name);
-    } else if($eof_ea['CoEnrollmentFlow']['authz_level'] == EnrollmentAuthzEnum::None ) {
-      $this->redirect($onFinish);
-    }
-
+    $target['action'] = 'link';
+    $target['controller'] = Inflector::tableize($this->plugin);
     $target['plugin'] = Inflector::singularize(Inflector::tableize($this->plugin));
     $target['co'] = (int)$eof_ea['CoEnrollmentFlow']['co_id'];
     $target['coef'] = (int)$onFinish['coef'];
@@ -352,6 +369,8 @@ class LinkOrgIdentityEnrollerCoPetitionsController extends CoPetitionsController
     }
     // Get the identifier of type epuid of the registered user
     try {
+      // todo: Move this into the Model
+      // todo: Identifier should be configurable. We should not force type to ePUID
       $this->Identifier = ClassRegistry::init('Identifier');
       $identifier_registered_user = $this->Identifier->find('first', array(
         'contain' => false,
@@ -388,10 +407,15 @@ class LinkOrgIdentityEnrollerCoPetitionsController extends CoPetitionsController
     $data['link_org_identity_enroller_id'] = $shibSession['registered_user']['cfg'];
     $data['token'] = $token;
     $data['data'] = $attrs;
+    $data['type'] =$this->Session->read('Plugin.LinkOrgIdentityEnroller.type');
     // Save everything to database and logout or redirect
     if($this->LinkOrgIdentityState->save($data)){
       $this->log(__METHOD__ . "::successfuly saved the data", LOG_DEBUG);
       unset($data);
+    } else {
+      $invalidFields = $this->LinkOrgIdentityState->invalidFields();
+      $this->log(__METHOD__ . '::exception error => ' . print_r($invalidFields, true), LOG_DEBUG);
+      $this->Flash->set("Database(Link State) save failed.", array('key' => 'error'));
     }
   
     // Redirect to the linking enrollment flow
@@ -401,9 +425,13 @@ class LinkOrgIdentityEnrollerCoPetitionsController extends CoPetitionsController
       "/eaf:1" .
       "/coef:{$coef}";
     $urlenc_return = urldecode($return);
-    if (!empty($this->request->data['LinkOrgIdentityEnroller']['idpHint'])) {
+    if (!empty($this->request->data['LinkOrgIdentityEnroller']['idpHint'])
+        && !empty($orgIdentitiesList)
+        && !empty($orgIdentitiesList[$this->request->data['LinkOrgIdentityEnroller']['idpHint']])) {
       $idphint = urlencode($orgIdentitiesList[$this->request->data['LinkOrgIdentityEnroller']['idpHint']]);
       $urlenc_return .= "?idphint={$idphint}";
+    } else {
+      $this->log(__METHOD__ . "::No idpHint parameter or OrgIdentity list is empty.", LOG_DEBUG);
     }
   
     $this->LinkOrgIdentityEnroller->id = $shibSession['registered_user']['cfg'];

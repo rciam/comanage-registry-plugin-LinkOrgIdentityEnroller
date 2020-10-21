@@ -64,6 +64,7 @@
     <field name="exp_window" type="I"/>
     <field name="email_redirect_mode" type="C" size="1" />
     <field name="data" type="C" size="2048"/>
+    <field name="type" type="C" size="2"/>
     <field name="created" type="T" />
     <field name="modified" type="T" />
     <field name="deleted" type="L" />
