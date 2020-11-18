@@ -65,6 +65,7 @@ $saml_attributes = array(
   "md_orgName",
   "persistent-id",
   "sn",
+  "subject-id",
 );
 
 // Get the data from the form

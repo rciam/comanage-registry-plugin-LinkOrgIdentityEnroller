@@ -57,6 +57,11 @@ class LinkOrgIdentityEnroller extends AppModel
       'required' => true,
       'message' => 'Provide the Auxiliary Authentication path',
     ),
+    'user_id_attribute' => array(
+      'rule' => 'alphanumeric',
+      'required' => true,
+      'message' => 'Provide the User ID Attribute name',
+    ),
     'email_redirect_mode' => array(
       'rule' => array('inList',
         array(LinkOrgIdentityRedirectModeEnum::Enabled,
@@ -440,21 +445,23 @@ class LinkOrgIdentityEnroller extends AppModel
   
   
   /**
-   * @param $registered_user
-   * @param $cmp_attibutes_list
-   * @param $email_verified
-   * @return mixed
+   * @param string $registered_user
+   * @param array $cmp_attibutes_list
+   * @param string $email_verified
+   * @param array $plg_cfg
+   * @return  mixed
    */
-  public function createOrgIdentity($registered_user, $cmp_attibutes_list, $email_verified) {
+  public function createOrgIdentity($registered_user, $cmp_attibutes_list, $email_verified, $plg_cfg) {
     $this->OrgIdentity = ClassRegistry::init('OrgIdentity');
 
     // Create the data we need to save so as to create the OrgIdentity and all the relations
     $authn_authority_list = explode(';', $cmp_attibutes_list['AuthenticatingAuthority']);
+    $user_id_attribute = $plg_cfg['user_id_attribute'];
 
     $association_data = array(
       'OrgIdentity' => array(
         'co_id'             => (int)$registered_user['co_id'],
-        'actor_identifier'  => $cmp_attibutes_list['eduPersonUniqueId'], // Mew IdP data
+        'actor_identifier'  => $cmp_attibutes_list[$user_id_attribute], // Mew IdP data
         'authn_authority'   => end($authn_authority_list),     // Get the last AuthnAthority
         'affiliation'       => AffiliationEnum::Member,
       ),
@@ -468,9 +475,9 @@ class LinkOrgIdentityEnroller extends AppModel
         array(
           'type'              => IdentifierEnum::ePUID,
           'login'             => true,
-          'identifier'        => $cmp_attibutes_list['eduPersonUniqueId'],
+          'identifier'        => $cmp_attibutes_list[$user_id_attribute],
           'status'            => SuspendableStatusEnum::Active,
-          'actor_identifier'  => $cmp_attibutes_list['eduPersonUniqueId'],
+          'actor_identifier'  => $cmp_attibutes_list[$user_id_attribute],
         )
       ),
     );
@@ -489,7 +496,7 @@ class LinkOrgIdentityEnroller extends AppModel
           'family'            => $cmp_attibutes_list['sn'],
           'type'              => NameEnum::Official,
           'primary_name'      => true,
-          'actor_identifier'  => $cmp_attibutes_list['eduPersonUniqueId'],
+          'actor_identifier'  => $cmp_attibutes_list[$user_id_attribute],
         )
       );
     }
@@ -505,7 +512,7 @@ class LinkOrgIdentityEnroller extends AppModel
           'type'              => EmailAddressEnum::Official,
           'mail'              => $cmp_attibutes_list['mail'],
           'verified'          => (bool)$email_verified,
-          'actor_identifier'  => $cmp_attibutes_list['eduPersonUniqueId'],
+          'actor_identifier'  => $cmp_attibutes_list[$user_id_attribute],
         )
       );
     }
@@ -516,7 +523,7 @@ class LinkOrgIdentityEnroller extends AppModel
         array(
           'subject' => $cmp_attibutes_list['distinguishedName'],
           'type'    => CertEnum::X509,
-          'actor_identifier' => $cmp_attibutes_list['eduPersonUniqueId'],
+          'actor_identifier' => $cmp_attibutes_list[$user_id_attribute],
         ),
       );
     }

@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Typo error in ConfigureShell.php
 
-## [v.0.3.1] - 2020-11-18
+## [v0.3.1] - 2020-11-18
 ### Added
 - Configuration shell script for setup
 - SQL script containing tables and constraints required for the plugin

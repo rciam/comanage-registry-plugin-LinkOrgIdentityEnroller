@@ -23,6 +23,7 @@ class AppSchema extends CakeSchema {
     'idp_blacklist' => array('type' => 'string', 'null' => false, 'length' => 4000),
     'logout_endpoint' => array('type' => 'string', 'null' => false, 'length' => 80),
     'aux_auth' => array('type' => 'string', 'null' => false, 'length' => 80),
+    'user_id_attribute' => array('type' => 'string', 'null' => false, 'length' => 64),
     'return' => array('type' => 'string', 'null' => false, 'length' => 50),
     'exp_window' => array('type' => 'integer', 'null' => true, 'length' => 10),
     'created' => array('type' => 'datetime', 'null' => true),

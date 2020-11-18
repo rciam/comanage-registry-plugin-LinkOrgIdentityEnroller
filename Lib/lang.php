@@ -45,6 +45,8 @@ $cm_link_org_identity_enroller_texts['en_US'] = array(
   'pl.link_org_identity_enroller.return.desc'              => 'This is the return query parameter with the Service URL. At the end of linking we will redirect at the url stored in this parameter.',
   'pl.link_org_identity_enroller.idpblacklist'             => 'Identity Provider Blacklist',
   'pl.link_org_identity_enroller.idpblacklist.desc'        => 'Provide the CSV list of Identity Providers that will be excluded from implicit linking',
+  'pl.link_org_identity_enroller.useridattr'               => 'User ID Attribute',
+  'pl.link_org_identity_enroller.useridattr.desc'          => 'The name of the Attribute used to store the ID of the user',
 
   
   // Operation

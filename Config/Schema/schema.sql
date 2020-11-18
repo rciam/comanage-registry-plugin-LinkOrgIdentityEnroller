@@ -16,6 +16,7 @@ create table if not exists cm_link_org_identity_enrollers
     introduction_text    varchar(4000) not null,
     logout_endpoint      varchar(80)   not null,
     aux_auth             varchar(80)   not null,
+    user_id_attribute    varchar(64)   not null,
     return               varchar(50)   not null,
     exp_window           integer,
     created              timestamp,

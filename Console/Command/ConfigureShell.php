@@ -39,8 +39,6 @@ class ConfigureShell extends AppShell {
 
 
   public function setupdb() {
-
-    $db = ConnectionManager::getDataSource('default');
     $prefix = "";
     if(isset($db->config['prefix'])) {
       $prefix = $db->config['prefix'];
@@ -55,7 +53,29 @@ class ConfigureShell extends AppShell {
     // cm_link_org_identity_states
     $query[] = "ALTER TABLE ONLY " . $prefix . "link_org_identity_states ADD CONSTRAINT ". $prefix . "link_org_identity_states_link_org_identity_enroller_id_fkey FOREIGN KEY (link_org_identity_enroller_id) REFERENCES " . $prefix . "link_org_identity_enrollers(id);";
 
+    $this->database_update($query);
+  }
 
+  public function _ug040() {
+    $prefix = "";
+    if(isset($db->config['prefix'])) {
+      $prefix = $db->config['prefix'];
+    }
+
+    $query = array();
+    //  cm_link_org_identity_enrollers
+    $query[] = "ALTER TABLE ONLY " . $prefix . "link_org_identity_enrollers ADD user_id_attribute VARCHAR(64);";
+
+    $this->database_update($query);
+  }
+
+  /**
+   * @param array $query
+   */
+  private function database_update($query) {
+    $registry_path = $this->in('registry path:', null, $this->default_registry_path);
+
+    $db = ConnectionManager::getDataSource('default');
     $db->begin();
     try {
       foreach ($query as $idx => $qr) {
@@ -69,6 +89,10 @@ class ConfigureShell extends AppShell {
       $db->rollback();
       $this->out('<error>' . $e->getMessage() . '</error>');
     }
+
+    // Clear caches
+    $output = shell_exec("su - www-data -s /bin/bash -c \"cd " . $registry_path . "/app && ./Console/clearcache\"");
+    $this->out('<info>' . $output . '</info>');
   }
 
   public function setupcfg() {

@@ -435,6 +435,22 @@ if (!$e) {
       ?>
     </div>
   </li>
+  <li id="<?php print Inflector::slug(strtolower(_txt('pl.link_org_identity_enroller.useridattr')));?>">
+    <div class="field-name">
+      <div class="field-title">
+        <?php print _txt('pl.link_org_identity_enroller.useridattr'); ?>
+        <span class="required">*</span>
+      </div>
+      <div class="field-desc"><?php print _txt('pl.link_org_identity_enroller.useridattr.desc'); ?></div>
+    </div>
+    <div class="field-info">
+      <?php
+      $value = empty($link_org_identity_enrollers['LinkOrgIdentityEnroller']['user_id_attribute']) ? ""
+        : filter_var($link_org_identity_enrollers['LinkOrgIdentityEnroller']['user_id_attribute'],FILTER_SANITIZE_SPECIAL_CHARS) ;
+      print $this->Form->input('LinkOrgIdentityEnroller.user_id_attribute', array('size' => 50, 'value' => $value));
+      ?>
+    </div>
+  </li>
   <li id="<?php print Inflector::slug(strtolower(_txt('pl.link_org_identity_enroller.intro')));?>" class="field-stack">
     <div class="field-name">
       <div class="field-title">
