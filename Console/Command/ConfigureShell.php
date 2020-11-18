@@ -48,12 +48,12 @@ class ConfigureShell extends AppShell {
 
     $query = array();
     //  cm_link_org_identity_enrollers
-    $query[] = "ALTER TABLE ONLY ' . $prefix . 'link_org_identity_enrollers ADD CONSTRAINT ' . $prefix . 'link_org_identity_enrollers_co_id_fkey FOREIGN KEY (co_id) REFERENCES ' . $prefix . 'cos(id);";
+    $query[] = "ALTER TABLE ONLY " . $prefix . "link_org_identity_enrollers ADD CONSTRAINT ". $prefix . "link_org_identity_enrollers_co_id_fkey FOREIGN KEY (co_id) REFERENCES " . $prefix . "cos(id);";
     // cm_link_org_identity_eofs
-    $query[] = "ALTER TABLE ONLY ' . $prefix . 'link_org_identity_eofs ADD CONSTRAINT ' . $prefix . 'link_org_identity_eofs_link_org_identity_enroller_id_fkey FOREIGN KEY (link_org_identity_enroller_id) REFERENCES ' . $prefix . 'link_org_identity_enrollers(id);";
-    $query[] = "ALTER TABLE ONLY ' . $prefix . 'link_org_identity_eofs ADD CONSTRAINT ' . $prefix . 'link_org_identity_eofs_co_enrollment_flow_id_fkey FOREIGN KEY (co_enrollment_flow_id) REFERENCES ' . $prefix . 'co_enrollment_flows(id);";
+    $query[] = "ALTER TABLE ONLY " . $prefix . "link_org_identity_eofs ADD CONSTRAINT ". $prefix . "link_org_identity_eofs_link_org_identity_enroller_id_fkey FOREIGN KEY (link_org_identity_enroller_id) REFERENCES " . $prefix . "link_org_identity_enrollers(id);";
+    $query[] = "ALTER TABLE ONLY " . $prefix . "link_org_identity_eofs ADD CONSTRAINT ". $prefix . "link_org_identity_eofs_co_enrollment_flow_id_fkey FOREIGN KEY (co_enrollment_flow_id) REFERENCES " . $prefix . "co_enrollment_flows(id);";
     // cm_link_org_identity_states
-    $query[] = "ALTER TABLE ONLY ' . $prefix . 'link_org_identity_states ADD CONSTRAINT ' . $prefix . 'link_org_identity_states_link_org_identity_enroller_id_fkey FOREIGN KEY (link_org_identity_enroller_id) REFERENCES ' . $prefix . 'link_org_identity_enrollers(id);";
+    $query[] = "ALTER TABLE ONLY " . $prefix . "link_org_identity_states ADD CONSTRAINT ". $prefix . "link_org_identity_states_link_org_identity_enroller_id_fkey FOREIGN KEY (link_org_identity_enroller_id) REFERENCES " . $prefix . "link_org_identity_enrollers(id);";
 
 
     $db->begin();
