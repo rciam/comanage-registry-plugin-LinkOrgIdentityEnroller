@@ -58,7 +58,7 @@ class LinkOrgIdentityEnroller extends AppModel
       'message' => 'Provide the Auxiliary Authentication path',
     ),
     'user_id_attribute' => array(
-      'rule' => 'alphanumeric',
+      'rule' => 'notBlank',
       'required' => true,
       'message' => 'Provide the User ID Attribute name',
     ),
