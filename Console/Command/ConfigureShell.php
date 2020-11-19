@@ -6,6 +6,8 @@ class ConfigureShell extends AppShell {
   private $default_www_path = '/var/www/html';
   private $default_registry_path = '/srv/comanage/comanage-registry-current';
   private $reg_def_cron_fn = 'comanage-registry';
+  private $db = null;
+  private $targetVersion = null;
 
   var $uses = array(
     'LinkOrgIdentityEnroller.LinkOrgIdentityEnroller',
@@ -13,12 +15,13 @@ class ConfigureShell extends AppShell {
     'LinkOrgIdentityEnroller.LinkOrgIdentityState');
 
   public function main() {
-    $targetVersion = null;
+    // Load Database configuration
+    $this->db = ConnectionManager::getDataSource('default');
     if(!empty($this->args[0])
-       && $this->args[0] !== 'setup') {
+      && strpos($this->args[0],'setup') === false) {
       // Use requested target version
-      $targetVersion = $this->args[0];
-      $fn = '_ug' . $targetVersion;
+      $this->targetVersion = $this->args[0];
+      $fn = '_ug' . $this->targetVersion;
       if(method_exists($this, $fn)) {
         $this->$fn();
       } elseif($this->args[0] === 'setupdb') {
@@ -40,8 +43,8 @@ class ConfigureShell extends AppShell {
 
   public function setupdb() {
     $prefix = "";
-    if(isset($db->config['prefix'])) {
-      $prefix = $db->config['prefix'];
+    if(isset($this->db->config['prefix'])) {
+      $prefix = $this->db->config['prefix'];
     }
 
     $query = array();
@@ -58,8 +61,8 @@ class ConfigureShell extends AppShell {
 
   public function _ug040() {
     $prefix = "";
-    if(isset($db->config['prefix'])) {
-      $prefix = $db->config['prefix'];
+    if(isset($this->db->config['prefix'])) {
+      $prefix = $this->db->config['prefix'];
     }
 
     $query = array();
@@ -75,18 +78,20 @@ class ConfigureShell extends AppShell {
   private function database_update($query) {
     $registry_path = $this->in('registry path:', null, $this->default_registry_path);
 
-    $db = ConnectionManager::getDataSource('default');
-    $db->begin();
+    if(is_null($this->db)) {
+      $this->db = ConnectionManager::getDataSource('default');
+    }
+    $this->db->begin();
     try {
       foreach ($query as $idx => $qr) {
         $result = $this->LinkOrgIdentityEnroller->query($qr);
         $this->out('<info>' . ($idx+1) . '. SQL command:</info> ' . $qr);
         $this->out('Query Result: ' . print_r($result, true));
       }
-      $db->commit();
+      $this->db->commit();
     }
     catch(Exception $e) {
-      $db->rollback();
+      $this->db->rollback();
       $this->out('<error>' . $e->getMessage() . '</error>');
     }
 

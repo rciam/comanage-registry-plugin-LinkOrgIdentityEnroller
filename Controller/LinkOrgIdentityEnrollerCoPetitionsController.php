@@ -53,6 +53,8 @@ class LinkOrgIdentityEnrollerCoPetitionsController extends CoPetitionsController
       $dataTable = json_decode(unserialize($state_db_entry['LinkOrgIdentityState']['data']), true);
       // Get the configuration
       $loiecfg = $this->LinkOrgIdentityEnroller->getConfiguration($dataTable['registered_user']['co_id']);
+      // Get the attribute holding the remote user
+      $user_id_attribute = $loiecfg['LinkOrgIdentityEnroller']['user_id_attribute'];
       
       // Calculate if the linking petition is still valid
       $exp_window = (int)$loiecfg['LinkOrgIdentityEnroller']['exp_window'];
@@ -73,10 +75,10 @@ class LinkOrgIdentityEnrollerCoPetitionsController extends CoPetitionsController
       if(empty($dataTable['cmp_attributes_list'])) {
         $attrValuesArray = !empty($this->request->data) ? $this->request->data : null;
         list($cmp_list, $dataTable['cmp_attributes_list']) = $this->LinkOrgIdentityEnroller->getAttrValues($attrValuesArray);
-        // Check if this eduPersonUniqueId identifier already exists
-        if($this->LinkOrgIdentityEnroller->findDuplicateOrgId($dataTable['cmp_attributes_list']['eduPersonUniqueId'], $dataTable['registered_user']['co_id'])) {
+        // Check if this user_id_attribute identifier already exists
+        if($this->LinkOrgIdentityEnroller->findDuplicateOrgId($dataTable['cmp_attributes_list'][$user_id_attribute], $dataTable['registered_user']['co_id'])) {
           $this->Flash->set(_txt('er.ia.exists',
-            array(filter_var($dataTable['cmp_attributes_list']['eduPersonUniqueId'],FILTER_SANITIZE_SPECIAL_CHARS))),
+            array(filter_var($dataTable['cmp_attributes_list'][$user_id_attribute],FILTER_SANITIZE_SPECIAL_CHARS))),
             array('key' => 'error'));
           $this->redirect_location = $fullBsUrl . '/registry/co_people/canvas/'. $dataTable['registered_user']['co_person_id'];
           $this->redirect($this->redirect_location);
@@ -86,7 +88,10 @@ class LinkOrgIdentityEnrollerCoPetitionsController extends CoPetitionsController
       $this->log(__METHOD__ . "::dataTable['cmp_attributes_list'] => " .print_r($dataTable['cmp_attributes_list'],true), LOG_DEBUG);
       $verified = (preg_match("/mail/i", $loiecfg['LinkOrgIdentityEnroller']['cmp_attribute_name'])!= false ) ? true : false;
       // Try to save the schema to the database with only one transaction
-      if ($this->LinkOrgIdentityEnroller->createOrgIdentity($dataTable['registered_user'], $dataTable['cmp_attributes_list'], $verified)) {
+      if ($this->LinkOrgIdentityEnroller->createOrgIdentity($dataTable['registered_user'],
+                                                            $dataTable['cmp_attributes_list'],
+                                                            $verified,
+                                                            $loiecfg['LinkOrgIdentityEnroller'])) {
         // Inform the user
         $this->Flash->set(_txt('rs.saved'), array('key' => 'success'));
         // The default redirect uri will the profile/canvas of the user
