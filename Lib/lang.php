@@ -47,17 +47,22 @@ $cm_link_org_identity_enroller_texts['en_US'] = array(
   'pl.link_org_identity_enroller.idpblacklist.desc'        => 'Provide the CSV list of Identity Providers that will be excluded from implicit linking',
   'pl.link_org_identity_enroller.useridattr'               => 'User ID Attribute',
   'pl.link_org_identity_enroller.useridattr.desc'          => 'The name of the Attribute used to store the ID of the user',
-
+  'pl.link_org_identity_enroller.subjectdn'                => 'Certificate Subject DN',
+  'pl.link_org_identity_enroller.subjectdn.desc'           => 'The name of the Attribute used to store the Certificate Subject DN',
+  'pl.link_org_identity_enroller.issuerdn'                 => 'Certificate Issuer DN',
+  'pl.link_org_identity_enroller.issuerdn.desc'            => 'The name of the Attribute used to store the Certificate Issuer DN',
   
   // Operation
   'op.link_org_identity_enroller.link'                    => 'Link',
   'op.link_org_identity_enroller.action'                  => 'Action',
   'op.link_org_identity_enroller.select-a'                => 'Select %1$s',
   'op.link_org_identity_enroller.abort'                   => 'Abort Linking',
-  
+  'op.link_org_identity_enroller.config'                  => 'Configuration',
+  'op.link_org_identity_enroller.attrmap'                 => 'Attribute Mappings',
+
   // Database
   'rs.link_org_identity_enroller.error'                   => 'Save failed',
-  'rs.link_org_identity_eof.deleted'                 => 'Entry Deleted',
+  'rs.link_org_identity_eof.deleted'                      => 'Entry Deleted',
   
   
   'fd.link_org_identity_enroller.user'                    => 'User',

@@ -42,6 +42,8 @@
     <field name="logout_endpoint" type="C" size="80"/>
     <field name="aux_auth" type="C" size="80"/>
     <field name="user_id_attribute" type="C" size="64"/>
+    <field name="issuer_dn_attribute" type="C" size="32"/>
+    <field name="subject_dn_attribute" type="C" size="32"/>
     <!-- _subject and _body are deprecated (CO-1213) -->
     <field name="verification_subject" type="C" size="256" />
     <field name="verification_body" type="X" size="4000" />

@@ -62,6 +62,16 @@ class LinkOrgIdentityEnroller extends AppModel
       'required' => true,
       'message' => 'Provide the User ID Attribute name',
     ),
+    'issuer_dn_attribute' => array(
+      'rule' => 'alphanumeric',
+      'required' => false,
+      'allowEmpty' => true,
+    ),
+    'subject_dn_attribute' => array(
+      'rule' => 'alphanumeric',
+      'required' => false,
+      'allowEmpty' => true,
+    ),
     'email_redirect_mode' => array(
       'rule' => array('inList',
         array(LinkOrgIdentityRedirectModeEnum::Enabled,
@@ -454,7 +464,7 @@ class LinkOrgIdentityEnroller extends AppModel
   public function createOrgIdentity($registered_user, $cmp_attibutes_list, $email_verified, $plg_cfg) {
     $this->OrgIdentity = ClassRegistry::init('OrgIdentity');
 
-    // Create the data we need to save so as to create the OrgIdentity and all the relations
+    // Fetch Environmental Variables
     $authn_authority_list = explode(';', $cmp_attibutes_list['AuthenticatingAuthority']);
     $user_id_attribute = $plg_cfg['user_id_attribute'];
 
@@ -516,18 +526,34 @@ class LinkOrgIdentityEnroller extends AppModel
         )
       );
     }
-  
-    // The Subject DN is fetched as the attribute distinguishedName
-    if(!empty($cmp_attibutes_list['distinguishedName'])){
+
+    // Certificate handle
+    list($subject_value, $issuer_value) = CertUtils::getEnvValuesFromCache($plg_cfg, $cmp_attibutes_list);
+    if(CertUtils::consumeDecideVoPersonCertAttr($plg_cfg, $cmp_attibutes_list)) {
+      if(!empty($subject_value)) {
+        $association_data['Cert'] = array();
+        $sdn_values = explode(';', $subject_value);
+        foreach($sdn_values as $dn) {
+          $association_data['Cert'][] = array(
+            'subject' => $dn,
+            'type' => CertEnum::X509,
+            'actor_identifier' => $cmp_attibutes_list[$user_id_attribute],
+          );
+        }
+      }
+    } else {
       $association_data['Cert'] = array(
         array(
-          'subject' => $cmp_attibutes_list['distinguishedName'],
-          'type'    => CertEnum::X509,
+          'subject' => trim($subject_value),
+          'issuer' => trim($issuer_value),
+          'type' => CertEnum::X509,
           'actor_identifier' => $cmp_attibutes_list[$user_id_attribute],
         ),
       );
     }
-  
+
+//    $this->log(__METHOD__ . '::OrgIdentity Data => ' . print_r($association_data, true), LOG_DEBUG);
+
     // The options for the save association
     // if i disable provisioning then i do not get the error from ldap provisioner plugin
     // This is disirable here since we add everything manually. So there is no EOF to handle provisioning.
@@ -552,5 +578,3 @@ class LinkOrgIdentityEnroller extends AppModel
     }
   }
 }
-
-

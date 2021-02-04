@@ -119,10 +119,7 @@ This table matches the Plugin version with the supported COmanage version.
 
 | Plugin |  COmanage |    PHP    |
 |:------:|:---------:|:---------:|
-| v0.1.x | v3.1.x    | &gt;=v5.6 |
-| v0.2.x | v3.1.x    | &gt;=v5.6 |
-| v0.3.x | v3.1.x    | &gt;=v5.6 |
-| v0.4.x | v3.1.x    | &gt;=v5.6 |
+| v0.x   | v3.1.x    | &gt;=v5.6 |
 
 ## License
 

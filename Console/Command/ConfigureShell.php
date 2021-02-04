@@ -1,6 +1,7 @@
 <?php
 /*
- * For execution run:cd /srv/comanage/comanage-registry-current Console/cake configure setup
+ * For execution run:cd /srv/comanage/comanage-registry-current/app Console/cake LinkOrgIdentityEnroller.configure setup
+ * For execution run:cd /srv/comanage/comanage-registry-current/app Console/cake LinkOrgIdentityEnroller.configure 050
  * */
 class ConfigureShell extends AppShell {
   private $default_www_path = '/var/www/html';
@@ -68,6 +69,20 @@ class ConfigureShell extends AppShell {
     $query = array();
     //  cm_link_org_identity_enrollers
     $query[] = "ALTER TABLE ONLY " . $prefix . "link_org_identity_enrollers ADD user_id_attribute VARCHAR(64);";
+
+    $this->database_update($query);
+  }
+
+  public function _ug050() {
+    $prefix = "";
+    if(isset($this->db->config['prefix'])) {
+      $prefix = $this->db->config['prefix'];
+    }
+
+    $query = array();
+    //  cm_link_org_identity_enrollers
+    $query[] = "ALTER TABLE ONLY " . $prefix . "link_org_identity_enrollers ADD COLUMN IF NOT EXISTS issuer_dn VARCHAR(32);";
+    $query[] = "ALTER TABLE ONLY " . $prefix . "link_org_identity_enrollers ADD COLUMN IF NOT EXISTS subject_dn VARCHAR(32);";
 
     $this->database_update($query);
   }
