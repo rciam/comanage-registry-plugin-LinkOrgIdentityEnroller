@@ -102,6 +102,8 @@ The LinkOrgIdentityEnroller plugin can be configured only by a coadmin or a cmad
   <li>This is the endpoint configured in the Application/Session configuration in the shibboleth apache2 module. The plugin will enforce logout if we enable the Email Confirmation Mode. By default the plugin accepts that the emails are legit and tags them as verified.
   <li>This is the 'dummy' endpoint that will be used for authenticated the user and getting its Identity Provider data for implicit/explicit linking
   <li>Define the User ID Attribute holding user's identifier in the Session, e.g. eduPersonUniqueId
+  <li>Define the Certificate Subject DN Attribute map in the Session, e.g. voPersonCertificateDN
+  <li>Define the Certificate Issuer DN Attribute map in the Session, e.g. voPersonCertificateIssuerDn
   <li>Define the text that will be presented to the user during Sign Up in the linking page.
   <li>Enable or disable the Email Confirmation mode.
   <li>This is the query parameter that encompasses the Service provider destination URL. This parameter is attached to the URL by the proxy and at the end of implicit Linking the user will get redirected to this service.
