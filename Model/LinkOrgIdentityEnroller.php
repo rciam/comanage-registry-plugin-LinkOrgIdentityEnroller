@@ -370,7 +370,7 @@ class LinkOrgIdentityEnroller extends AppModel
    * @return array
    * @todo replace strpos with str_ends_with in PHP V8.0
    */
-  public function getAttrValues($plg_cfg, $envAssociativeArray=[]) {
+  public function getAttrValues($plg_cfg=[], $envAssociativeArray=[]) {
     // If the user provided no array then try to fecth the values from the environment
     // We assume that the shibboleth apache2 module will expose the attributes in the environment
     // The $getVal variable is a function that represents either the getenv function or a wrapper around the array of attribute values
