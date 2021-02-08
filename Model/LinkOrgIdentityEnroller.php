@@ -364,10 +364,13 @@ class LinkOrgIdentityEnroller extends AppModel
   
   
   /**
+   * @param array $plg_cfg                Configuration of the plugin. ONLY LinkOrgIdentityEnroller Model table
    * @param array $envAssociativeArray
+   *
    * @return array
+   * @todo replace strpos with str_ends_with in PHP V8.0
    */
-  public function getAttrValues($envAssociativeArray=[]) {
+  public function getAttrValues($plg_cfg, $envAssociativeArray=[]) {
     // If the user provided no array then try to fecth the values from the environment
     // We assume that the shibboleth apache2 module will expose the attributes in the environment
     // The $getVal variable is a function that represents either the getenv function or a wrapper around the array of attribute values
@@ -375,7 +378,7 @@ class LinkOrgIdentityEnroller extends AppModel
     $getVal = empty($envAssociativeArray) ? function($attr) {return !empty(getenv($attr)) ? getenv($attr) : "";} :
                                             function($attr) use($envAssociativeArray) {return !empty($envAssociativeArray[$attr]) ? $envAssociativeArray[$attr] : "";};
     
-    // Get the list of the cmp enrollment attributes
+    // Get the list of the cCMP Enrollment Attribute Mapping
     $args = array();
     //$args['conditions'][] = 'CmpEnrollmentAttribute.env_name like \'%mail%\'';
     $args['conditions']['NOT']['CmpEnrollmentAttribute.env_name'] = '';
@@ -383,6 +386,18 @@ class LinkOrgIdentityEnroller extends AppModel
     $args['contain'] = false;
     $cmpEnrollmentAttributes = ClassRegistry::init('CmpEnrollmentAttribute');
     $attribute_list = $cmpEnrollmentAttributes->find('list', $args);
+
+    // Get the list of LinkOrgIdentityEnroller Attribute Mapping
+    $cfg_attribute_list = array_filter(
+      $plg_cfg,
+      function($value, $key) {
+        return (strpos($key, '_attribute') !== false);
+      },
+      ARRAY_FILTER_USE_BOTH
+    );
+
+    // Merge the attributes i will cache from the Environment
+    $attribute_list = array_merge($attribute_list, $cfg_attribute_list);
     
     if(!empty($attribute_list) && is_array($attribute_list)){
       $attr_data = array();

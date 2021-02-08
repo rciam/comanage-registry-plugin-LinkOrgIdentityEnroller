@@ -74,7 +74,7 @@ class LinkOrgIdentityEnrollerCoPetitionsController extends CoPetitionsController
       // For the case we are linking from inside a user's profile, fetch and store the new data
       if(empty($dataTable['cmp_attributes_list'])) {
         $attrValuesArray = !empty($this->request->data) ? $this->request->data : null;
-        list($cmp_list, $dataTable['cmp_attributes_list']) = $this->LinkOrgIdentityEnroller->getAttrValues($attrValuesArray);
+        list($cmp_list, $dataTable['cmp_attributes_list']) = $this->LinkOrgIdentityEnroller->getAttrValues($loiecfg['LinkOrgIdentityEnroller'], $attrValuesArray);
         // Check if this user_id_attribute identifier already exists
         if($this->LinkOrgIdentityEnroller->findDuplicateOrgId($dataTable['cmp_attributes_list'][$user_id_attribute], $dataTable['registered_user']['co_id'])) {
           $this->Flash->set(_txt('er.ia.exists',
@@ -395,7 +395,7 @@ class LinkOrgIdentityEnrollerCoPetitionsController extends CoPetitionsController
     // TODO:Check if i use this multiple times. If so use CACHE to store the result and reuse
     // TODO: like in here: local/Plugin/LinkOrgIdentityEnroller/Controller/LinkOrgIdentityEnrollersController.php:132
     if(empty($this->Session->read('Auth.User.cos'))) {
-      list($cmp_list, $shibSession['cmp_attributes_list']) = $this->LinkOrgIdentityEnroller->getAttrValues();
+      list($cmp_list, $shibSession['cmp_attributes_list']) = $this->LinkOrgIdentityEnroller->getAttrValues($loiecfg['LinkOrgIdentityEnroller']);
     }
     // Serialize the environmental variable and save them to the database
     $attrs = serialize(json_encode($shibSession));
