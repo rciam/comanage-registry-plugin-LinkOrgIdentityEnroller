@@ -66,6 +66,8 @@ $saml_attributes = array(
   "persistent-id",
   "sn",
   "subject-id",
+  "voPersonCertificateDN",
+  "voPersonCertificateIssuerDN"
 );
 
 // Get the data from the form
