@@ -628,7 +628,7 @@ if(!$e) {
                 <?php
                 $value = empty($link_org_identity_enrollers['LinkOrgIdentityEnroller']['subject_dn_attribute']) ? ""
                   : filter_var($link_org_identity_enrollers['LinkOrgIdentityEnroller']['subject_dn_attribute'], FILTER_SANITIZE_SPECIAL_CHARS);
-                print $this->Form->input('LinkOrgIdentityEnroller.subject_dn', array('size' => 50, 'value' => $value));
+                print $this->Form->input('LinkOrgIdentityEnroller.subject_dn_attribute', array('size' => 50, 'value' => $value));
                 ?>
               </div>
             </li>
@@ -643,7 +643,7 @@ if(!$e) {
                 <?php
                 $value = empty($link_org_identity_enrollers['LinkOrgIdentityEnroller']['issuer_dn_attribute']) ? ""
                   : filter_var($link_org_identity_enrollers['LinkOrgIdentityEnroller']['issuer_dn_attribute'], FILTER_SANITIZE_SPECIAL_CHARS);
-                print $this->Form->input('LinkOrgIdentityEnroller.issuer_dn', array('size' => 50, 'value' => $value));
+                print $this->Form->input('LinkOrgIdentityEnroller.issuer_dn_attribute', array('size' => 50, 'value' => $value));
                 ?>
               </div>
             </li>
