@@ -117,11 +117,13 @@ If we enable the email confirmation mode then the user will forced to logout and
 
 ## Compatibility matrix
 
-This table matches the Plugin version with the supported COmanage version.
+This table matches the Plugin version with the version of the Database, PHP and COmanage.
 
-| Plugin |  COmanage |    PHP    |
-|:------:|:---------:|:---------:|
-| v0.x   | v3.1.x    | &gt;=v5.6 |
+|    Plugin    |  COmanage |    PHP    |    PostgresDB    |
+|:------------:|:---------:|:---------:|:----------------:|
+| =&lt; v0.4.x | v3.1.x    | &gt;=v5.6 |    &gt;=v9.1     |
+| &gt;= v0.5.x | v3.1.x    | &gt;=v5.6 |    &gt;=v9.6     |
+
 
 ## License
 
