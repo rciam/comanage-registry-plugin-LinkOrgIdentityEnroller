@@ -542,17 +542,19 @@ class LinkOrgIdentityEnroller extends AppModel
         }
       }
     } else {
-      $association_data['Cert'] = array(
-        array(
-          'subject' => trim($subject_value),
-          'issuer' => trim($issuer_value),
-          'type' => CertEnum::X509,
-          'actor_identifier' => $cmp_attibutes_list[$user_id_attribute],
-        ),
-      );
+      if(!empty($subject_value)) {
+        $association_data['Cert'] = array(
+          array(
+            'subject' => trim($subject_value),
+            'issuer' => !empty($issuer_value) ? trim($issuer_value) : "",
+            'type' => CertEnum::X509,
+            'actor_identifier' => $cmp_attibutes_list[$user_id_attribute],
+          ),
+        );
+      }
     }
 
-//    $this->log(__METHOD__ . '::OrgIdentity Data => ' . print_r($association_data, true), LOG_DEBUG);
+    $this->log(__METHOD__ . '::OrgIdentity Data => ' . print_r($association_data, true), LOG_DEBUG);
 
     // The options for the save association
     // if i disable provisioning then i do not get the error from ldap provisioner plugin
