@@ -569,6 +569,20 @@ class LinkOrgIdentityEnroller extends AppModel
       }
     }
 
+    // XXX RCIAM specific Model
+    if(!empty($cmp_attibutes_list['eduPersonAssurance'])
+       && in_array("Assurance", App::objects('Model'))) {
+      $association_data['Assurance'] = array();
+      $assurance_values = explode(';', $cmp_attibutes_list['eduPersonAssurance']);
+      foreach($assurance_values as $val) {
+        $association_data['Assurance'][] = array(
+          'value' => $val,
+          'type' => AssuranceComponentEnum::AssuranceProfile,
+          'actor_identifier' => $cmp_attibutes_list[$user_id_attribute],
+        );
+      }
+    }
+
     $this->log(__METHOD__ . '::OrgIdentity Data => ' . print_r($association_data, true), LOG_DEBUG);
 
     // The options for the save association
