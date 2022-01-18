@@ -15,6 +15,7 @@ create table if not exists cm_link_org_identity_enrollers
     verification_body    varchar(4000) not null,
     introduction_text    varchar(4000) not null,
     logout_endpoint      varchar(80)   not null,
+    mdq_url              varchar(512)   not null,
     aux_auth             varchar(80)   not null,
     user_id_attribute    varchar(64)   not null,
     issuer_dn_attribute  varchar(64),

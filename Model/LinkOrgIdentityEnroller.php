@@ -52,6 +52,11 @@ class LinkOrgIdentityEnroller extends AppModel
       'required' => true,
       'message' => 'Provide the shibd logout endopoint',
     ),
+    'mdq_url' => array(
+      'rule' => array('url', true),
+      'required' => false,
+      'allowEmpty' => true,
+    ),
     'aux_auth' => array(
       'rule' => 'notBlank',
       'required' => true,
@@ -607,5 +612,36 @@ class LinkOrgIdentityEnroller extends AppModel
       $dbc->rollback();
       return false;
     }
+  }
+
+  /**
+   * @param $url
+   * @param $value
+   * @return array|void
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   */
+  public function mdqSearch($url, $value) {
+    $config = [
+      null, null, null, null, null, null, $url
+    ];
+    $mdq_client = $this->getLinkIdentityClient(...$config);
+    return $mdq_client->mdqSearch($value);
+  }
+
+  /**
+   * @param $protocol
+   * @param $host
+   * @param $port
+   * @param $location
+   * @param $robot_cert
+   * @param $robot_key
+   * @param $url
+   * @return LinkIdentityClient|null
+   */
+  protected function getLinkIdentityClient($protocol, $host, $port, $location, $robot_cert, $robot_key, $url) {
+    if(is_null($this->_identity_client)) {
+      $this->_identity_client = new LinkIdentityClient($protocol, $host, $port, $location, $robot_cert, $robot_key, $url);
+    }
+    return $this->_identity_client;
   }
 }

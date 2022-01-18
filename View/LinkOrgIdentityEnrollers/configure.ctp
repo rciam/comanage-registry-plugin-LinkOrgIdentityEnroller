@@ -348,10 +348,10 @@ if(!$e) {
                 ?>
               </div>
             </li>
-            <li>
+            <li id="<?php print Inflector::slug(strtolower(_txt('fd.link_org_identity_enroller.status'))); ?>">
               <div class="field-name">
                 <div class="field-title">
-                  <?php print $this->Form->label('status', _txt('fd.status')); ?>
+                  <?php print $this->Form->label('status', _txt('fd.link_org_identity_enroller.status')); ?>
                   <span class="required">*</span>
                 </div>
               </div>
@@ -442,6 +442,21 @@ if(!$e) {
                 $value = empty($link_org_identity_enrollers['LinkOrgIdentityEnroller']['logout_endpoint']) ? ""
                   : filter_var($link_org_identity_enrollers['LinkOrgIdentityEnroller']['logout_endpoint'], FILTER_SANITIZE_SPECIAL_CHARS);
                 print $this->Form->input('LinkOrgIdentityEnroller.logout_endpoint', array('size' => 50, 'value' => $value));
+                ?>
+              </div>
+            </li>
+            <li id="<?php print Inflector::slug(strtolower(_txt('pl.link_org_identity_enroller.mdq.url'))); ?>">
+              <div class="field-name">
+                <div class="field-title">
+                  <?php print _txt('pl.link_org_identity_enroller.mdq.url'); ?>
+                </div>
+                <div class="field-desc"><?php print _txt('pl.link_org_identity_enroller.mdq.url.desc'); ?></div>
+              </div>
+              <div class="field-info">
+                <?php
+                $value = empty($link_org_identity_enrollers['LinkOrgIdentityEnroller']['mdq_url']) ? ""
+                  : filter_var($link_org_identity_enrollers['LinkOrgIdentityEnroller']['mdq_url'], FILTER_SANITIZE_SPECIAL_CHARS);
+                print $this->Form->input('LinkOrgIdentityEnroller.mdq_url', array('size' => 50, 'value' => $value));
                 ?>
               </div>
             </li>

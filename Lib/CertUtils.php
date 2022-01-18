@@ -58,7 +58,7 @@ class CertUtils {
   }
 
   /**
-   * Check if the envarinmental attribute has value. If this is the case check if it is single valued or multi valued
+   * Check if the environmental attribute has value. If this is the case check if it is single valued or multi valued
    *
    * @param string $env_value
    * @return bool|null  true for MULTI valued | false for SINGLE valued | null for NO value
