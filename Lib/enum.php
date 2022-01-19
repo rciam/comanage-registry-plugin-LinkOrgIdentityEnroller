@@ -42,3 +42,13 @@ class LinkOrgIdentityStatusEnum
   );
 }
 
+class LinkOrgIdentityRestActionsEnum
+{
+  const SEARCH = 'search';
+  const UPDATE = 'update';
+  const type = array(
+    'search' => 'Search',
+    'update' => 'Update',
+  );
+}
+

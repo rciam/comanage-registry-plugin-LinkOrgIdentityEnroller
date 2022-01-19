@@ -22,6 +22,7 @@ class AppSchema extends CakeSchema {
     'introduction_text' => array('type' => 'string', 'null' => false, 'length' => 4000),
     'idp_blacklist' => array('type' => 'string', 'null' => false, 'length' => 4000),
     'logout_endpoint' => array('type' => 'string', 'null' => false, 'length' => 80),
+    'mdq_url' => array('type' => 'string', 'null' => true, 'length' => 512),
     'aux_auth' => array('type' => 'string', 'null' => false, 'length' => 80),
     'user_id_attribute' => array('type' => 'string', 'null' => false, 'length' => 64),
     'issuer_dn_attribute' => array('type' => 'string', 'null' => true, 'length' => 64),

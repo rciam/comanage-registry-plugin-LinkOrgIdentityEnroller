@@ -40,6 +40,7 @@
     <field name="status" type="C" size="1"/>
     <field name="cmp_attribute_name" type="C" size="80" />
     <field name="logout_endpoint" type="C" size="80"/>
+    <field name="mdq_url" type="C" size="512"/>
     <field name="aux_auth" type="C" size="80"/>
     <field name="user_id_attribute" type="C" size="64"/>
     <field name="issuer_dn_attribute" type="C" size="64"/>
