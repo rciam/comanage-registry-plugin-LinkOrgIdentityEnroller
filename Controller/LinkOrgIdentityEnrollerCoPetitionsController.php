@@ -372,22 +372,14 @@ class LinkOrgIdentityEnrollerCoPetitionsController extends CoPetitionsController
     if (!empty($this->request->data['LinkOrgIdentityEnroller']['query'])) {
       $shibSession['query'] = json_decode(unserialize($this->request->data['LinkOrgIdentityEnroller']['query']));
     }
-    // Get the identifier of type epuid of the registered user
+
+    // Get access to the configuration
+    $loiecfg = $this->LinkOrgIdentityEnroller->getConfiguration($this->request->data['LinkOrgIdentityEnroller']['co_id']);
+
     try {
-      // todo: Move this into the Model
-      // todo: Identifier should be configurable. We should not force type to ePUID
-      $this->Identifier = ClassRegistry::init('Identifier');
-      $identifier_registered_user = $this->Identifier->find('first', array(
-        'contain' => false,
-        'fields' => array('identifier'),
-        'conditions' => array(
-          'co_person_id' => $shibSession['registered_user']['co_person_id'],
-          'type' => IdentifierEnum::ePUID,
-        )
-      ));
-      $shibSession['registered_user']['identifier'] = !empty($identifier_registered_user['Identifier']['identifier']) ?
-        $identifier_registered_user['Identifier']['identifier']
-        : "";
+      // Get the identifier of the registered user from the environmen
+      $user_id_attribute = $loiecfg['LinkOrgIdentityEnroller']['user_id_attribute'];
+      $shibSession['registered_user']['identifier'] = !empty(getenv($user_id_attribute)) ? getenv($user_id_attribute) : "";
     } catch (Exception $e){
       $this->log(__METHOD__ . "::an error occurred while retrieving the identifier => ". $e, LOG_DEBUG);
     }

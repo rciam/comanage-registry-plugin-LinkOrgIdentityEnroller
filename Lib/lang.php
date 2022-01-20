@@ -51,6 +51,8 @@ $cm_link_org_identity_enroller_texts['en_US'] = array(
   'pl.link_org_identity_enroller.subjectdn.desc'           => 'The name of the Attribute used to store the Certificate Subject DN',
   'pl.link_org_identity_enroller.issuerdn'                 => 'Certificate Issuer DN',
   'pl.link_org_identity_enroller.issuerdn.desc'            => 'The name of the Attribute used to store the Certificate Issuer DN',
+  'pl.link_org_identity_enroller.mdq.url'                  => 'Metadata Query(MDQ) domain',
+  'pl.link_org_identity_enroller.mdq.url.desc'             => 'Metatdata Query access domain, e.g. http://example.com. Location for search will be/pyff/api',
   
   // Operation
   'op.link_org_identity_enroller.link'                    => 'Link',
@@ -64,6 +66,7 @@ $cm_link_org_identity_enroller_texts['en_US'] = array(
   'rs.link_org_identity_enroller.error'                   => 'Save failed',
   'rs.link_org_identity_eof.deleted'                      => 'Entry Deleted',
   
-  
+  // Fields
   'fd.link_org_identity_enroller.user'                    => 'User',
+  'fd.link_org_identity_enroller.status'                  => 'Status',
 );

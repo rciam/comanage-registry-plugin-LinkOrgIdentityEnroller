@@ -20,6 +20,13 @@ class LinkOrgIdentityEnrollersController extends StandardController
     $this->log(__METHOD__ . "::link", LOG_DEBUG);
     $registrations = $this->Session->read('Auth.User.Registrations');
     if(isset($registrations)) {
+      // Get the intro text from the configuration
+      $this->LinkOrgIdentityEnroller->id = $this->request->params['named']['cfg'];
+      $introduction_text = $this->LinkOrgIdentityEnroller->field('introduction_text');
+      $this->set('vv_introduction_text', $introduction_text);
+      // Get the mdq url from the configuration
+      $mdq_url = $this->LinkOrgIdentityEnroller->field('mdq_url');
+
       $this->set('vv_registrations', $registrations);
       // Create a second array with the fields i want to display and everything hidden
       $registrations_display = array();
@@ -37,7 +44,17 @@ class LinkOrgIdentityEnrollersController extends StandardController
         $single_idp = array();
         foreach ($reg[0]['idp'] as $key => $value) {
           if(!in_array($value, $single_idp) && !empty($value)) {
-            $single_idp[$key] = $value;
+            // Fetch the friendly name
+            $mdq_response = $this->LinkOrgIdentityEnroller->mdqSearch($mdq_url, $value);
+            $idp_title = null;
+            if(!empty($mdq_response)
+               && $mdq_response['status_code'] == 200) {
+              $idp_data = json_decode($mdq_response['data']);
+              if(!empty($idp_data[0])) {
+                $idp_title = $idp_data[0]->title;
+              }
+            }
+            $single_idp[$value] = $idp_title ?? $value;
           }
         }
         $tmp_reg['IdP'] = $single_idp;
@@ -50,11 +67,6 @@ class LinkOrgIdentityEnrollersController extends StandardController
       if(!empty($this->request->query)) {
         $this->set('query', serialize(json_encode($this->request->query)));
       }
-
-      // Get the intro text from the configuration
-      $this->LinkOrgIdentityEnroller->id = $this->request->params['named']['cfg'];
-      $introduction_text = $this->LinkOrgIdentityEnroller->field('introduction_text');
-      $this->Set('vv_introduction_text', $introduction_text);
     }
   }
   
