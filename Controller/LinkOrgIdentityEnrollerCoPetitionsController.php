@@ -374,10 +374,10 @@ class LinkOrgIdentityEnrollerCoPetitionsController extends CoPetitionsController
     }
 
     // Get access to the configuration
-    $loiecfg = $this->LinkOrgIdentityEnroller->getConfiguration($this->request->data['LinkOrgIdentityEnroller']['co_id']);
+    $loiecfg = $this->LinkOrgIdentityEnroller->getConfiguration($shibSession['registered_user']['co_id']);
 
     try {
-      // Get the identifier of the registered user from the environmen
+      // Get the identifier of the registered user from the environment
       $user_id_attribute = $loiecfg['LinkOrgIdentityEnroller']['user_id_attribute'];
       $shibSession['registered_user']['identifier'] = !empty(getenv($user_id_attribute)) ? getenv($user_id_attribute) : "";
     } catch (Exception $e){
