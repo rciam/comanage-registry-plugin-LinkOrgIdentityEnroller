@@ -424,8 +424,8 @@ class LinkOrgIdentityEnrollerCoPetitionsController extends CoPetitionsController
     $urlenc_return = urldecode($return);
     if (!empty($this->request->data['LinkOrgIdentityEnroller']['idpHint'])
         && !empty($orgIdentitiesList)
-        && !empty($orgIdentitiesList[$this->request->data['LinkOrgIdentityEnroller']['idpHint']])) {
-      $idphint = urlencode($orgIdentitiesList[$this->request->data['LinkOrgIdentityEnroller']['idpHint']]);
+        && in_array($this->request->data['LinkOrgIdentityEnroller']['idpHint'],$orgIdentitiesList)) {
+      $idphint = urlencode($this->request->data['LinkOrgIdentityEnroller']['idpHint']);
       $urlenc_return .= "?idphint={$idphint}";
     } else {
       $this->log(__METHOD__ . "::No idpHint parameter or OrgIdentity list is empty.", LOG_DEBUG);
