@@ -41,7 +41,7 @@ class LinkOrgIdentityState extends AppModel
   public function getStateByToken($token) {
     $args = array();
     $args['conditions']['LinkOrgIdentityState.token'] = $token;
-    $args['conditions'][] = "NOT LinkOrgIdentityState.deleted";
+    $args['conditions'][] = "LinkOrgIdentityState.deleted IS NOT true";
     $args['contain'] = false;
     
     return $this->find('first',$args);
